@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>leaflet playback</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="leaflet.css">
+    <script type="text/javascript" src="leaflet.js"></script>
+    <script type="text/javascript" src="googleLayer.js"></script>
+    <!-- <script type="text/javascript" src="LeafletPlayback.js"></script> -->
+    <!-- <script type="text/javascript" src="leafletPlaybackControl.js"></script> -->
+</head>
+
+<body>
+    <div id="map" style="position:absolute;top:0;left:0;bottom:0;right:0;width:100%;height:100%;overflow:hidden;"></div>
+    <script type="text/javascript">
+    var map = L.map('map', {
+        center: [39, 116],
+        zoom: 4,
+        zoomControl: false
+    });
+    L.tileLayer.GoogleLayer().addTo(map);
+    </script>
+</body>
+
+</html>
