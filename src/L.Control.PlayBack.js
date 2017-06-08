@@ -91,6 +91,5 @@ L.Control.PlayBack = L.Control.extend({
 	_scrollchange:function(){},
 
 	_update:function(){
-
 	}
 });
