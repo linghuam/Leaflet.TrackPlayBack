@@ -6,6 +6,7 @@
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="leaflet.css">
     <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">
+    <script type="text/javascript" src='jquery.min.js'></script>
     <script type="text/javascript" src="leaflet.js"></script>
     <script type="text/javascript" src="googleLayer.js"></script>
     <!-- <script type="text/javascript" src="LeafletPlayback.js"></script> -->
@@ -13,7 +14,7 @@
 </head>
 
 <body>
-    <div id="map" style="position:absolute;top:0;left:0;bottom:0;right:0;width:100%;height:100%;overflow:hidden;"></div>
+<!--     <div id="map" style="position:absolute;top:0;left:0;bottom:0;right:0;width:100%;height:100%;overflow:hidden;"></div>
     <script type="text/javascript">
     var map = L.map('map', {
         center: [39, 116],
@@ -21,7 +22,23 @@
         zoomControl: false
     });
     L.tileLayer.GoogleLayer().addTo(map);
-    </script>
+    </script> -->
+    <div>
+    <div class="operateContainer">
+       <span class="glyphicon glyphicon-play"></span>
+       <span class="glyphicon glyphicon-repeat"></span>
+       <span class="glyphicon glyphicon-backward"></span>
+       <span class="glyphicon glyphicon-forward"></span>
+       <span class="speed">*1</span>
+       <span class="glyphicon glyphicon-remove"></span>
+    </div>
+        <div class="scrollContainer">
+            <span class="stime">2017-6-1</span>
+            <span class="etime">2017-12-25</span>
+            <input type="range"/>
+            <span class="curtime">2017-6-12</span>
+        </div>
+    </div>
 </body>
 
 </html>
