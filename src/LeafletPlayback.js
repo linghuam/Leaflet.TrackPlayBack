@@ -19,22 +19,22 @@
 
     L.Playback = L.Playback || {};
 
-    L.Playback.Util  = {
-         /*根据unix时间戳获取时间字符串*/
-        getTimeStrFromUnix: function(time){
+    L.Playback.Util = {
+        /*根据unix时间戳获取时间字符串*/
+        getTimeStrFromUnix: function(time) {
             time = parseInt(time);
-            if(isNaN(time)){
+            if (isNaN(time)) {
                 return "";
             }
-             var newDate = new Date(time*1000);
+            var newDate = new Date(time);
             // var newDate = new Date(time);    
-            var year=newDate.getFullYear();
-            var month=(newDate.getMonth()+1)<10?"0"+(newDate.getMonth()+1):newDate.getMonth()+1;
-            var day=newDate.getDate()<10?"0"+newDate.getDate():newDate.getDate();
-            var hours=newDate.getHours()<10?"0"+newDate.getHours():newDate.getHours();
-            var minuts=newDate.getMinutes()<10?"0"+newDate.getMinutes():newDate.getMinutes();
-            var seconds=newDate.getSeconds()<10?"0"+newDate.getSeconds():newDate.getSeconds();
-            var ret=year+"-"+month+"-"+day+" "+hours+":"+minuts+":"+seconds;
+            var year = newDate.getFullYear();
+            var month = (newDate.getMonth() + 1) < 10 ? "0" + (newDate.getMonth() + 1) : newDate.getMonth() + 1;
+            var day = newDate.getDate() < 10 ? "0" + newDate.getDate() : newDate.getDate();
+            var hours = newDate.getHours() < 10 ? "0" + newDate.getHours() : newDate.getHours();
+            var minuts = newDate.getMinutes() < 10 ? "0" + newDate.getMinutes() : newDate.getMinutes();
+            var seconds = newDate.getSeconds() < 10 ? "0" + newDate.getSeconds() : newDate.getSeconds();
+            var ret = year + "-" + month + "-" + day + " " + hours + ":" + minuts + ":" + seconds;
             return ret;
         }
     };
@@ -153,20 +153,24 @@
 
     L.Playback.Track = L.Class.extend({
 
-        initialize: function(map, dataObj, options) {
+        initialize: function(map, geojsonFeature, options) {
             this._map = map;
             this.options = options || {};
-            this._dataObj = dataObj;
-            this._ticks = [];
-            this._times = [];
+            this._dataObj = geojsonFeature;
+            this._ticks = {};
+            this._times = geojsonFeature.properties.time;
             this._marker = null;
 
-            var sampleTimes = dataObj.timePosList;
+            var sampleTimes = this._times;
 
             for (var i = 0, len = sampleTimes.length; i < len; i++) {
-                var ti = sampleTimes[i].time;
-                this._times.push(ti);
-                this._ticks[ti] = sampleTimes[i];
+                var ti = sampleTimes[i];
+                var tickobj = {
+                    lat:geojsonFeature.geometry.coordinates[i][1],
+                    lng:geojsonFeature.geometry.coordinates[i][0],
+                    dir:0                    
+                };
+                this._ticks[ti] = tickobj;
                 if (i === 0) {
                     this._startTime = ti;
                 }
@@ -175,11 +179,11 @@
                 }
             }
 
-            if (!this._trackLineFeatureGroup) {
+            if (!this._map.hasLayer(this._trackLineFeatureGroup)) {
                 this._trackLineFeatureGroup = L.featureGroup([]).addTo(this._map);
             }
 
-            if (!this._trackPointFeatureGroup) {
+            if (!this._map.hasLayer(this._trackPointFeatureGroup)) {
                 this._trackPointFeatureGroup = L.featureGroup([]).addTo(this._map);
             }
 
@@ -199,7 +203,7 @@
                 if (this._marker) {
                     this._marker._icon.style[L.DomUtil.TRANSITION] = 'all 0ms linear';
                 }
-            },this);
+            }, this);
         },
 
         getFirstTick: function() {
@@ -420,11 +424,11 @@
                     clearTimeout(this._timeoutTicker);
                     this._timeoutTicker = null;
                 }
-                if (this._trackLineFeatureGroup) {
+                if (this._map.hasLayer(this._trackLineFeatureGroup)) {
                     this._trackLineFeatureGroup.clearLayers();
                     // this._trackLineFeatureGroup = null;
                 }
-                if (this._trackPointFeatureGroup) {
+                if (this._map.hasLayer(this._trackPointFeatureGroup)) {
                     this._trackPointFeatureGroup.clearLayers();
                     // this._trackPointFeatureGroup = null;
                 }

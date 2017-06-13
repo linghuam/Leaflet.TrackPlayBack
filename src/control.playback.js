@@ -9,7 +9,17 @@ L.Control.PlayBack = L.Control.extend({
         Max_Speed: 20,
         trackLineOptions: { weight: 2, color: '#ef0300', renderer: L.svg() }, //轨迹线配置
         OriginCircleOptions: { stroke: false, color: '#ef0300', fillColor: '#ef0300', fillOpacity: 1, radius: 4, renderer: L.svg() }, //轨迹点配置
-        Icon: L.icon({ iconUrl: 'images/ship.png', iconSize: [12, 25], iconAnchor: [5, 12] })
+        layer: {
+            // pointToLayer(featureData, latlng)
+        },
+
+        marker: { //marker options
+            icon: L.icon({
+                iconUrl: 'images/ship.png',
+                iconSize: [12, 25],
+                iconAnchor: [5, 12] // 解析后：margin-left:-5px;margin-top:-12px;
+            })
+        }
     },
 
     bootstrapIconClass: {
@@ -34,7 +44,7 @@ L.Control.PlayBack = L.Control.extend({
     },
 
     onRemove: function(map) {
-
+        this._trackController.clearTracks();
     },
 
     getControlHtml: function() {
@@ -44,21 +54,25 @@ L.Control.PlayBack = L.Control.extend({
         html.push('<span class="btn-restart glyphicon glyphicon-repeat" title="重播"></span>');
         html.push('<span class="btn-slow glyphicon glyphicon-backward" title="减速"></span>');
         html.push('<span class="btn-quick glyphicon glyphicon-forward" title="加速"></span>');
-        html.push('<span class="speed">*1</span>');
+        html.push('<span class="speed"></span>');
         html.push('<span class="btn-close glyphicon glyphicon-remove" title="关闭"></span>');
         html.push('</div>');
         html.push('<div class="scrollContainer">');
-        html.push('<span class="stime">2017-6-1</span>');
-        html.push('<span class="etime">2017-12-25</span>');
+        html.push('<span class="stime"></span>');
+        html.push('<span class="etime"></span>');
         html.push('<input type="range" class="range"/>');
-        html.push('<span class="curtime">2017-6-12</span>');
+        html.push('<span class="curtime"></span>');
         html.push('</div>');
         return html.join('');
     },
 
     _initLayout: function() {
-        var className = 'leaflet-control-playback',
-            this._container = L.DomUtil.create('div', className);
+        var className = 'leaflet-control-playback';
+        this._container = L.DomUtil.create('div', className);
+
+        if (L.DomEvent) {
+            L.DomEvent.disableClickPropagation(this._container);
+        }
 
         $container = $(this._container);
         $container.html(this.getControlHtml());
@@ -68,7 +82,7 @@ L.Control.PlayBack = L.Control.extend({
             restart: $container.find('.btn-restart'),
             slow: $container.find('.btn-slow'),
             quick: $container.find('.btn-quick'),
-            speed: $container.find('speed'),
+            speed: $container.find('.speed'),
             close: $container.find('.btn-close'),
             startTime: $container.find('.stime'),
             endTime: $container.find('.etime'),
@@ -87,9 +101,6 @@ L.Control.PlayBack = L.Control.extend({
             .on(this._operateObjs.range, 'click', L.DomEvent.preventDefault)
             .on(this._operateObjs.range, 'change', this._scrollchange, this)
             .on(this._operateObjs.range, 'mousemove', this._scrollchange, this);
-        this._operateObjs.range.attr('min',this.getStartTime());
-        this._operateObjs.range.attr('max',this.getEndTime());
-        this._operateObjs.range.attr('value',this.getCurTime());
     },
 
     _play: function() {
@@ -114,13 +125,13 @@ L.Control.PlayBack = L.Control.extend({
     _slow: function() {
         this._playbackClock.slowSpeed();
         var sp = this._playbackClock.getSpeed();
-        this._operateObjs.speed.text("X" + sp);
+        this._operateObjs.speed.html("X" + sp);
     },
 
     _quick: function() {
         this._playbackClock.quickSpeed();
         var sp = this._playbackClock.getSpeed();
-        this._operateObjs.quick.text("X" + sp);
+        this._operateObjs.speed.html("X" + sp);
     },
 
     _close: function() {
@@ -142,8 +153,12 @@ L.Control.PlayBack = L.Control.extend({
                 var track = new L.Playback.Track(map, data.features[i], this.options);
                 tracks.push(track);
             }
-            var trackController = new L.Playback.TrackController(map, tracks, this.options);
-            this._playbackClock = new L.Playback.Clock(trackController, this._clockCallback, this.options);
+
+            var trackController = this._trackController = new L.Playback.TrackController(map, tracks, this.options);
+            this._playbackClock = new L.Playback.Clock(trackController, this._clockCallback.bind(this), this.options);
+
+            this._operateObjs.speed.html("X1");
+            this.setTime();
             this._playbackClock.setCursor(this.getStartTime());
         }
     },
@@ -152,9 +167,12 @@ L.Control.PlayBack = L.Control.extend({
         var startTime = L.Playback.Util.getTimeStrFromUnix(this.getStartTime()),
             endTime = L.Playback.Util.getTimeStrFromUnix(this.getEndTime()),
             curTime = L.Playback.Util.getTimeStrFromUnix(this.getCurTime());
-        this._scrollItems.startTime.innerText = startTime;
-        this._scrollItems.endTime.innerText = endTime;
-        this._scrollItems.curTime.innerText = curTime;
+        this._operateObjs.startTime.html(startTime);;
+        this._operateObjs.endTime.html(endTime);
+        this._operateObjs.curTime.html(curTime);
+        this._operateObjs.range.attr('min', this.getStartTime());
+        this._operateObjs.range.attr('max', this.getEndTime());
+        this._operateObjs.range.val(this.getCurTime());
     },
 
     getStartTime: function() {
@@ -172,8 +190,12 @@ L.Control.PlayBack = L.Control.extend({
     _clockCallback: function(ms) {
         //更新时间
         var time = L.Playback.Util.getTimeStrFromUnix(ms);
-        this._scrollItems.curTime.innerText = time;
+        this._operateObjs.curTime.html(time);
         //更新时间轴
-        this._playbackClock.setCursor(ms);
+        this._operateObjs.range.val(ms);
     }
 });
+
+L.control.playback = function(options) {
+    return new L.Control.PlayBack(options);
+}

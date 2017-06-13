@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>leaflet playback</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="lib/leaflet.css">
+    <link rel="stylesheet" type="text/css" href="control.playback.css">
+    <link rel="stylesheet" type="text/css" href="lib/bootstrap/css/bootstrap.min.css">
+    <script type="text/javascript" src='lib/jquery.min.js'></script>
+    <script type="text/javascript" src="lib/leaflet.js"></script>
+    <script type="text/javascript" src="lib/googleLayer.js"></script>
+    <script type="text/javascript" src="leafletplayback.js"></script>
+    <script type="text/javascript" src="control.control.playback.js"></script>
+</head>
+
+<body>
+    <div id="map" style="position:absolute;top:0;left:0;bottom:0;right:0;width:100%;height:100%;overflow:hidden;"></div>
+    <script type="text/javascript">
+    var map = L.map('map', {
+        center: [15, 117],
+        zoom: 10,
+        zoomControl: false
+    });
+    L.tileLayer.GoogleLayer().addTo(map);
+    $.getJSON('data/more.json', function(res) {
+        var data = res;
+            L.control.playback({
+                data: data
+            }).addTo(map);
+    })
+    </script>
+</body>
+
+</html>
