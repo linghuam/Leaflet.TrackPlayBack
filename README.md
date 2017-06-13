@@ -1,8 +1,11 @@
 ## Leaflet-trackPlayback-Control 
-说明：该库来源于[SituationPlayback](https://github.com/linghuam/SituationPlayback),之前弃用，将会在该库完成轨迹回放
-功能，并完善成各个版本。
+
 基于leaflet实现的海上船舶轨迹回放插件，支持轨迹的播放、暂停、快进、快退操作。兼容leaflet V1+。
 查看[demo](https://linghuam.github.io/TrackPlayback/src/index.html)
+
+### Remind
+说明：该库来源于[SituationPlayback](https://github.com/linghuam/SituationPlayback),之前弃用，将会在该库完成轨迹回放
+功能，并完善成各个版本。
 
 ### Download and Usage
 下载该库，使用方法见src/index.html示例。
