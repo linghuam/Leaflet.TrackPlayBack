@@ -5,7 +5,7 @@ L.Control.PlayBack = L.Control.extend({
 
     options: {
         position: 'topright',
-        speed: 1,
+        speed: 13,
         Max_Speed: 20,
         trackLineOptions: { weight: 2, color: '#ef0300', renderer: L.svg() }, //轨迹线配置
         OriginCircleOptions: { stroke: false, color: '#ef0300', fillColor: '#ef0300', fillOpacity: 1, radius: 4, renderer: L.svg() }, //轨迹点配置
@@ -157,7 +157,7 @@ L.Control.PlayBack = L.Control.extend({
             var trackController = this._trackController = new L.Playback.TrackController(map, tracks, this.options);
             this._playbackClock = new L.Playback.Clock(trackController, this._clockCallback.bind(this), this.options);
 
-            this._operateObjs.speed.html("X1");
+            this._operateObjs.speed.html(this.options.speed);
             this.setTime();
             this._playbackClock.setCursor(this.getStartTime());
         }
