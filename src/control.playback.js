@@ -157,7 +157,7 @@ L.Control.PlayBack = L.Control.extend({
             var trackController = this._trackController = new L.Playback.TrackController(map, tracks, this.options);
             this._playbackClock = new L.Playback.Clock(trackController, this._clockCallback.bind(this), this.options);
 
-            this._operateObjs.speed.html(this.options.speed);
+            this._operateObjs.speed.html("X"+this.options.speed);
             this.setTime();
             this._playbackClock.setCursor(this.getStartTime());
         }
