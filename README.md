@@ -1,6 +1,7 @@
 ## Leaflet-trackPlayback-Control 
 
 基于leaflet实现的海上船舶轨迹回放插件，支持轨迹的播放、暂停、快进、快退操作。兼容leaflet V1+。
+
 查看[demo](https://linghuam.github.io/TrackPlayback/src/index.html)
 
 ### Remind
