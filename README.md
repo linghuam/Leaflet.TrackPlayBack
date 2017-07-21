@@ -5,7 +5,7 @@
 查看[demo](https://linghuam.github.io/TrackPlayback/src/index.html)
 
 ### Remind
-说明：该库来源于[SituationPlayback](https://github.com/linghuam/SituationPlayback),之前弃用，将会在该库完成轨迹回放功能，并完善成各个版本。
+说明：该库来源于[SituationPlayback](https://github.com/linghuam/SituationPlayback)（已弃用），将会在该库完成轨迹回放功能，并完善成各个版本。
 
 ### Download and Usage
 下载该库，使用方法见src/index.html示例。
