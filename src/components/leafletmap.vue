@@ -5,9 +5,8 @@
 <script>
 import L from 'leaflet'
 import '../assets/leaflet.googlelayer'
-import '../assets/leafletplayback'
 import '../assets/control.playback'
-import Data from '../assets/data/more.json'
+import Data from '../assets/data/1.json'
 
 export default {
   data () {

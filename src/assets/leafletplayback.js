@@ -1,10 +1,9 @@
 import L from 'leaflet'
-import $ from 'jquery'
 
 L.Playback = L.Playback || {}
 
 L.Playback.Util = {
-        /* 根据unix时间戳获取时间字符串 */
+   /* 根据unix时间戳获取时间字符串 */
   getTimeStrFromUnix: function (time) {
     time = parseInt(time)
     if (isNaN(time)) {
@@ -25,46 +24,13 @@ L.Playback.Util = {
 
 L.Playback.MoveableMarker = L.Marker.extend({
 
-  initialize: function (startLatLng, options, feature) {
+  initialize: function (startLatLng, options) {
     var markerOptions = options.marker || {}
-
-            // 根据track dataobj生成markerOptions
-    if ($.isFunction(markerOptions)) {
-      markerOptions = markerOptions(feature)
-    }
-
     L.Marker.prototype.initialize.call(this, startLatLng, markerOptions)
-
-    this.popupContent = ''
-    this.feature = feature
-
-    if (markerOptions.getPopup) {
-      this.popupContent = markerOptions.getPopup(feature)
-    }
-
-    if (options.popups) {
-      this.bindPopup(this.getPopupContent() + startLatLng.toString())
-    }
-
-    if (options.labels) {
-      if (this.bindLabel) {
-        this.bindLabel(this.getPopupContent(), { noHide: true })
-      } else {
-        console.log('Label binding requires leaflet-label (https://github.com/Leaflet/Leaflet.label)')
-      }
-    }
-  },
-
-  getPopupContent: function () {
-    if (this.popupContent !== '') {
-      return '<b>' + this.popupContent + '</b><br/>'
-    }
-
-    return ''
   },
 
   move: function (latLng, transitionTime) {
-            // Only if CSS3 transitions are supported
+    // Only if CSS3 transitions are supported
     if (L.DomUtil.TRANSITION) {
       if (this._icon) {
         this._icon.style[L.DomUtil.TRANSITION] = 'all ' + transitionTime + 'ms linear'
@@ -75,21 +41,17 @@ L.Playback.MoveableMarker = L.Marker.extend({
       }
     }
     this.setLatLng(latLng)
-    if (this._popup) {
-      this._popup.setContent(this.getPopupContent() + this._latlng.toString())
-    }
   },
 
-        // modify leaflet markers to add our roration code
-        /*
-         * Based on comments by @runanet and @coomsie
-         * https://github.com/CloudMade/Leaflet/issues/386
-         *
-         * Wrapping function is needed to preserve L.Marker.update function
-         */
+  // modify leaflet markers to add our roration code
+  /*
+   * Based on comments by @runanet and @coomsie
+   * https://github.com/CloudMade/Leaflet/issues/386
+   *
+   * Wrapping function is needed to preserve L.Marker.update function
+  */
   _old__setPos: L.Marker.prototype._setPos,
 
-        // linghuam edit
   _updateImg: function (i, a, s) {
     a = L.point(s).divideBy(2)._subtract(L.point(a))
     var transform = ''
@@ -122,7 +84,7 @@ L.Playback.MoveableMarker = L.Marker.extend({
       }
 
       if (this._shadow) {
-                    // Rotate around the icons anchor.
+        // Rotate around the icons anchor.
         s = this.options.icon.options.shadowSize
         i = this._shadow
         this._updateImg(i, a, s)
@@ -133,24 +95,20 @@ L.Playback.MoveableMarker = L.Marker.extend({
 
 L.Playback.Track = L.Class.extend({
 
-  initialize: function (map, geojsonFeature, options) {
+  initialize: function (map, dataObj, options) {
     this._map = map
     this.options = options || {}
-    this._dataObj = geojsonFeature
-    this._ticks = {}
-    this._times = geojsonFeature.properties.time
+    this._dataObj = dataObj
+    this._ticks = []
+    this._times = []
     this._marker = null
 
-    var sampleTimes = this._times
+    var sampleTimes = dataObj.timePosList
 
     for (var i = 0, len = sampleTimes.length; i < len; i++) {
-      var ti = sampleTimes[i]
-      var tickobj = {
-        lat: geojsonFeature.geometry.coordinates[i][1],
-        lng: geojsonFeature.geometry.coordinates[i][0],
-        dir: 0
-      }
-      this._ticks[ti] = tickobj
+      var ti = sampleTimes[i].time
+      this._times.push(ti)
+      this._ticks[ti] = sampleTimes[i]
       if (i === 0) {
         this._startTime = ti
       }
@@ -159,15 +117,15 @@ L.Playback.Track = L.Class.extend({
       }
     }
 
-    if (!this._map.hasLayer(this._trackLineFeatureGroup)) {
+    if (!this._trackLineFeatureGroup) {
       this._trackLineFeatureGroup = L.featureGroup([]).addTo(this._map)
     }
 
-    if (!this._map.hasLayer(this._trackPointFeatureGroup)) {
+    if (!this._trackPointFeatureGroup) {
       this._trackPointFeatureGroup = L.featureGroup([]).addTo(this._map)
     }
 
-            // 地图移动时，取消虚线样式
+    // 地图移动时，取消虚线样式
     this._map.on('moveend', function () {
       if (this._map.hasLayer(this._trackLineFeatureGroup)) {
         this._trackLineFeatureGroup.eachLayer(function (layer) {
@@ -178,7 +136,7 @@ L.Playback.Track = L.Class.extend({
       }
     }, this)
 
-            // 为地图添加缩放事件,避免在缩放时执行动画
+    // 为地图添加缩放事件,避免在缩放时执行动画
     this._map.on('zoomend ', function () {
       if (this._marker) {
         this._marker._icon.style[L.DomUtil.TRANSITION] = 'all 0ms linear'
@@ -257,7 +215,7 @@ L.Playback.Track = L.Class.extend({
     if (latlng) var cricleMarker = L.circleMarker(latlng, this.options.OriginCircleOptions)
     var infoObj = this.tick(timestamp)
     if (cricleMarker && infoObj) cricleMarker.bindTooltip(this.getTooltipText(infoObj), this.getTooltipOptions())
-            // 将最后一个点的信息绑定到船舶上
+    // 将最后一个点的信息绑定到船舶上
     if (this._marker) {
       this._marker.unbindTooltip()
       this._marker.bindTooltip(this.getTooltipText(infoObj), this.getTooltipOptions())
@@ -288,18 +246,18 @@ L.Playback.Track = L.Class.extend({
     }
   },
 
-        /*
-         * latLng 要移到的坐标点
-         * transitionTime 移到最新点经历的时间
-         * timestamp 当前的时间点
-         */
+ /*
+ * latLng 要移到的坐标点
+ * transitionTime 移到最新点经历的时间
+ * timestamp 当前的时间点
+ */
   moveMarker: function (latLng, transitionTime, timestamp) {
     if (this._marker) {
       var latlngold = this._marker.getLatLng()
       var tick = this.tick(timestamp)
 
       if (transitionTime !== 0 && tick) {
-                    // 绘制上一次到当前时间的历史轨迹线
+        // 绘制上一次到当前时间的历史轨迹线
         var latlngs = [
                         [latlngold.lat, latlngold.lng],
                         [latLng.lat, latLng.lng]
@@ -321,29 +279,29 @@ L.Playback.Track = L.Class.extend({
           path.style.strokeDashoffset = '0'
         }
 
-                    // 绘制当前时间的轨迹点
+        // 绘制当前时间的轨迹点
         var point = this.createTrackPoint(timestamp)
-                    // this._trackPointFeatureGroup.addLayer(point);
+        // this._trackPointFeatureGroup.addLayer(point);
 
-                    // 添加轨迹线的时间应该在船舶移动后添加
+        // 添加轨迹线的时间应该在船舶移动后添加
         var self = this;
         (function (polyline, point, transitionTime, dir) {
           self._timeoutTicker = setTimeout(function () {
             if (!self._timeoutTicker) return
-                            // self._trackLineFeatureGroup.addLayer(polyline);
+            // self._trackLineFeatureGroup.addLayer(polyline);
             self._trackPointFeatureGroup.addLayer(point)
             self._marker.setIconAngle(dir)
           }, transitionTime)
         })(polyline, point, transitionTime, dir)
 
-                    // 移动目标
-                    // this._marker.setIconAngle(tick.dir);
+        // 移动目标
+        // this._marker.setIconAngle(tick.dir);
         this._marker.move(latLng, transitionTime)
       } else {
         this.clearTrackInfo()
-                    // 绘制从开始到当前时间的历史轨迹线
+        // 绘制从开始到当前时间的历史轨迹线
         this.drawHistoryTrackLine(timestamp)
-                    // 绘制从开始到当前时间的历史轨迹点
+        // 绘制从开始到当前时间的历史轨迹点
         this.drawHistoryTrackPoints(timestamp)
       }
     }
@@ -379,7 +337,7 @@ L.Playback.Track = L.Class.extend({
     if (latlng) var cricleMarker = L.circleMarker(latlng, this.options.OriginCircleOptions)
     var infoObj = this.tick(timestamp)
     if (infoObj) cricleMarker.bindTooltip(this.getTooltipText(infoObj), this.getTooltipOptions())
-            // 将最后一个点的信息绑定到船舶上
+    // 将最后一个点的信息绑定到船舶上
     if (!this._marker) {
       this.setMarker(timestamp, this.options)
       this._map.addLayer(this._marker)
@@ -393,7 +351,7 @@ L.Playback.Track = L.Class.extend({
     return cricleMarker
   },
 
-        // 清除历史轨迹
+  // 清除历史轨迹
   clearTrackInfo: function () {
     try {
       this.removeMarker()
@@ -401,13 +359,13 @@ L.Playback.Track = L.Class.extend({
         clearTimeout(this._timeoutTicker)
         this._timeoutTicker = null
       }
-      if (this._map.hasLayer(this._trackLineFeatureGroup)) {
+      if (this._trackLineFeatureGroup) {
         this._trackLineFeatureGroup.clearLayers()
-                    // this._trackLineFeatureGroup = null;
+        // this._trackLineFeatureGroup = null;
       }
-      if (this._map.hasLayer(this._trackPointFeatureGroup)) {
+      if (this._trackPointFeatureGroup) {
         this._trackPointFeatureGroup.clearLayers()
-                    // this._trackPointFeatureGroup = null;
+        // this._trackPointFeatureGroup = null;
       }
     } catch (e) {
       console.log('tshf:clearlayer error')
@@ -424,18 +382,18 @@ L.Playback.TrackController = L.Class.extend({
 
     this._tracks = []
 
-            // initialize tick points
+    // initialize tick points
     this.setTracks(tracks)
   },
 
   clearTracks: function () { // 控件关闭时执行清理工作
     while (this._tracks.length > 0) {
       var track = this._tracks.pop()
-                // var marker = track.getMarker();
+      // var marker = track.getMarker();
 
-                // if (marker) {
-                //     this._map.removeLayer(marker);
-                // }
+      // if (marker) {
+      //     this._map.removeLayer(marker);
+      // }
 
       track.clearTrackInfo()
     }
@@ -449,14 +407,14 @@ L.Playback.TrackController = L.Class.extend({
   },
 
   setTracks: function (tracks) {
-            // reset current tracks
+    // reset current tracks
     this.clearTracks()
 
     this.addTracks(tracks)
   },
 
   addTracks: function (tracks) {
-            // return if nothing is set
+    // return if nothing is set
     if (!tracks) {
       return
     }
@@ -675,6 +633,13 @@ L.Playback.Clock = L.Class.extend({
   },
 
   start: function () {
+            // 旧版
+            // if (this._intervalID) return;
+            // this._intervalID = window.setInterval(
+            //   this._tick,
+            //   this._transitionTime,
+            //   this);
+
     if (this._intervalID) return
     this._intervalID = true
     this._intervalCount = 0
@@ -686,11 +651,11 @@ L.Playback.Clock = L.Class.extend({
       }
       var transtitionTime = self.getTransitionTime()
       var transitionTimeClock = self.getTransitionTimeClock()
-      if (self._intervalCount === 1) { // 加减速时再开始，时钟变化时间应为零
-        transitionTimeClock = 0
-      } else {
-        transitionTimeClock = self.getTransitionTimeClock()
-      }
+                // if (self._intervalCount === 1) { //加减速时再开始，时钟变化时间应为零
+                //     transitionTimeClock = 0;
+                // } else {
+                //     transitionTimeClock = self.getTransitionTimeClock();
+                // }
       clearTimeout(self._intervalID)
       self._intervalID = setTimeout(function () {
         self._tick(transtitionTime)
@@ -727,7 +692,7 @@ L.Playback.Clock = L.Class.extend({
     this._speed >= this.max_speed ? this._speed : this._speed += 1
     if (this._intervalID) {
       this.stop()
-      this.setCursor(this._cursor)
+                // this.setCursor(this._cursor);
       this.start()
     }
   },
@@ -737,7 +702,7 @@ L.Playback.Clock = L.Class.extend({
     this._speed <= 1 ? this._speed : this._speed -= 1
     if (this._intervalID) {
       this.stop()
-      this.setCursor(this._cursor)
+                // this.setCursor(this._cursor);
       this.start()
     }
   },

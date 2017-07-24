@@ -1,5 +1,6 @@
 import L from 'leaflet'
 import $ from 'jquery'
+import './leafletplayback'
 import './control.playback.css'
 
 L.Control.PlayBack = L.Control.extend({
@@ -147,11 +148,11 @@ L.Control.PlayBack = L.Control.extend({
 
   _update: function () {
     var map = this._map
-    var data = this._data
-    if (map && data && data.features && data.features.length) {
+    var data = this._dataTransform(this._data)
+    if (map && data) {
       var tracks = []
-      for (var i = 0, len = data.features.length; i < len; i++) {
-        var track = new L.Playback.Track(map, data.features[i], this.options)
+      for (var i = 0, len = data.length; i < len; i++) {
+        var track = new L.Playback.Track(map, data[i], this.options)
         tracks.push(track)
       }
 
@@ -194,6 +195,39 @@ L.Control.PlayBack = L.Control.extend({
     this._operateObjs.curTime.html(time)
         // 更新时间轴
     this._operateObjs.range.val(ms)
+  },
+
+  _dataTransform: function (data) {
+    if (!data || !data.length) {
+      console.log('playback_error:data transform error!')
+      return
+    }
+    var datas = []
+    for (var i = 0, len = data.length; i < len; i++) {
+      var ph = data[i].num
+      var dataobj = {}
+      dataobj.timePosList = []
+      for (var j = 0, lenj = data[i].posList.length; j < lenj; j++) {
+        var obj = {}
+        var pj = data[i].posList[j]
+        obj.lng = pj.lo / 600000
+        obj.lat = pj.la / 600000
+        obj.time = pj.ti * 1000
+        obj.dir = parseFloat(pj.co / 10)
+        obj.heading = parseFloat(pj.he)
+        obj.speed = parseFloat(pj.sp / 10)
+        obj.info_ph = ph
+        obj.info_lng = obj.lng
+        obj.info_lat = obj.lat
+        obj.info_time = obj.time // L.ict.app.util.dateTime.getTimeStrFromUnix(pj.ti*1000);
+        obj.info_dir = (pj.co / 10).toFixed(1) + '°'
+        obj.info_heading = parseFloat(pj.he).toFixed(1) + '°'
+        obj.info_speed = parseFloat(pj.sp / 10).toFixed(1) + '节'
+        dataobj.timePosList.push(obj)
+      }
+      datas.push(dataobj)
+    }
+    return datas
   }
 })
 
