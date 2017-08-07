@@ -60,10 +60,36 @@ L.Playback.Track = L.Class.extend({
     
     var t0 = times[left]
     var t1 = times[right]
-    var t =- time
-    startPt = L.point(this.getTrackPointByTime(t0)) 
-    endPt = this.getTrackPointByTime(t1)
-    var s = 
+    var t = time
+    startPt = L.point(this.getTrackPointByTime(t0).lng,this.getTrackPointByTime(t0).lat) 
+    endPt = L.point(this.getTrackPointByTime(t1).lng,this.getTrackPointByTime(t1).lat) 
+    var s = startPt.distanceTo(endPt);
+    var v = s / (t1 - t0)
+    var sinx = (endPt.y - startPt.y) / s
+    var cosx = (endPt.x - startPt.x) /s
+    var step = v * (t - t0)
+    var x = startPt.x + step * cosx
+    var y = startPt.y + step * sinx
+    return {
+      lng: x,
+      lat: y,
+      time: time
+    }
+
+  },
+
+  getTrackPointsBeforeTime: function (time) {
+    var tpoints = []
+    for(let i = 0, len = this._trackPoints.length; i < len; i++){
+      if(this._trackPoints[i].time < time){
+        tpoints.push(this._trackPoints[i])
+      }
+    }
+    var endPt = this.getCalculateTrackPointByTime(time)
+    if (endPt) {
+      tpoints.push(endPt)
+    }
+    return tpoints
   }
 
 })
