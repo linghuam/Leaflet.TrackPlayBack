@@ -148,7 +148,7 @@ L.Control.PlayBack = L.Control.extend({
 
   _update: function () {
     var map = this._map
-    var data = this._dataTransform(this._data)
+    var data = this._dataTransform(this._data.msg.shipList)
     if (map && data) {
       var tracks = []
       for (var i = 0, len = data.length; i < len; i++) {
