@@ -78,7 +78,7 @@ L.Playback.Clock = L.Class.extend({
   },
 
   setCursor: function (time) {
-    this._curTime = time;
+    this._curTime = time
     this._trackController.drawTrackByTime(this._curTime)
     this._callback(this._curTime)
   },

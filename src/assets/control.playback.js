@@ -12,7 +12,7 @@ L.Control.PlayBack = L.Control.extend({
     trackLineOptions: { weight: 2, color: '#ef0300', renderer: L.svg() }, // 轨迹线配置
     OriginCircleOptions: { stroke: false, color: '#ef0300', fillColor: '#ef0300', fillOpacity: 1, radius: 4, renderer: L.svg() }, // 轨迹点配置
     layer: {
-            // pointToLayer(featureData, latlng)
+      // pointToLayer(featureData, latlng)
     },
 
     marker: { // marker options
@@ -73,7 +73,7 @@ L.Control.PlayBack = L.Control.extend({
     var className = 'leaflet-control-playback'
     this._container = L.DomUtil.create('div', className)
 
-    if (L.DomEvent) {
+    if(L.DomEvent) {
       L.DomEvent.disableClickPropagation(this._container)
     }
 
@@ -101,14 +101,14 @@ L.Control.PlayBack = L.Control.extend({
     L.DomEvent.on(this._operateObjs.quick.get(0), 'click', this._quick, this)
     L.DomEvent.on(this._operateObjs.close.get(0), 'click', this._close, this)
     L.DomEvent.on(this._operateObjs.range.get(0), 'click mousedown dbclick', L.DomEvent.stopPropagation)
-            .on(this._operateObjs.range, 'click', L.DomEvent.preventDefault)
-            .on(this._operateObjs.range, 'change', this._scrollchange, this)
-            .on(this._operateObjs.range, 'mousemove', this._scrollchange, this)
+      .on(this._operateObjs.range.get(0), 'click', L.DomEvent.preventDefault)
+      .on(this._operateObjs.range.get(0), 'change', this._scrollchange, this)
+      .on(this._operateObjs.range.get(0), 'mousemove', this._scrollchange, this)
   },
 
   _play: function () {
     var $this = this._operateObjs.play
-    if ($this.hasClass(this.bootstrapIconClass.play)) {
+    if($this.hasClass(this.bootstrapIconClass.play)) {
       $this.removeClass(this.bootstrapIconClass.play)
       $this.addClass(this.bootstrapIconClass.stop)
       $this.attr('title', '停止')
@@ -122,6 +122,11 @@ L.Control.PlayBack = L.Control.extend({
   },
 
   _restart: function () {
+    //播放开始改变播放按钮样式
+    var $play = this._operateObjs.play
+    $play.removeClass(this.bootstrapIconClass.play)
+    $play.addClass(this.bootstrapIconClass.stop)
+    $play.attr('title', '停止')
     this._playbackClock.rePlaying()
   },
 
@@ -139,20 +144,23 @@ L.Control.PlayBack = L.Control.extend({
 
   _close: function () {
     L.DomUtil.remove(this._container)
-    if (this.onRemove) {
+    if(this.onRemove) {
       this.onRemove(this._map)
     }
     return this
   },
 
-  _scrollchange: function () {},
+  _scrollchange: function (e) {
+    var val = Number(e.target.value)
+    this._playbackClock.setCursor(val)
+  },
 
   _update: function () {
     var map = this._map
     var data = this._dataTransform(this._data.msg.shipList)
-    if (map && data) {
+    if(map && data) {
       var tracks = []
-      for (var i = 0, len = data.length; i < len; i++) {
+      for(var i = 0, len = data.length; i < len; i++) {
         var track = new L.Playback.Track(map, data[i], this.options)
         tracks.push(track)
       }
@@ -162,7 +170,7 @@ L.Control.PlayBack = L.Control.extend({
 
       this._operateObjs.speed.html('X' + this.options.speed)
       this.setTime()
-      // this._playbackClock.setCursor(this.getStartTime())
+      this._playbackClock.setCursor(this.getStartTime())
     }
   },
 
@@ -196,19 +204,27 @@ L.Control.PlayBack = L.Control.extend({
     this._operateObjs.curTime.html(time)
     // 更新时间轴
     this._operateObjs.range.val(s)
+    //播放结束后改变播放按钮样式
+    if(s >= this.getEndTime()) {
+      var $play = this._operateObjs.play
+      $play.removeClass(this.bootstrapIconClass.stop)
+      $play.addClass(this.bootstrapIconClass.play)
+      $play.attr('title', '播放')
+      this._playbackClock.stop()
+    }
   },
 
   _dataTransform: function (data) {
-    if (!data || !data.length) {
+    if(!data || !data.length) {
       console.log('playback_error:data transform error!')
       return
     }
     var datas = []
-    for (var i = 0, len = data.length; i < len; i++) {
+    for(var i = 0, len = data.length; i < len; i++) {
       var ph = data[i].num
       var dataobj = {}
       dataobj.timePosList = []
-      for (var j = 0, lenj = data[i].posList.length; j < lenj; j++) {
+      for(var j = 0, lenj = data[i].posList.length; j < lenj; j++) {
         var obj = {}
         var pj = data[i].posList[j]
         obj.lng = pj.lo / 600000
