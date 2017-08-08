@@ -72,7 +72,11 @@ L.Playback.Draw = L.Class.extend({
     }
     var img = new Image()
     img.onload = function () {
-      this._ctx.drawImage(img, point.x - offset.x, point.y - offset.y, width, height)
+      this._ctx.save()
+      this._ctx.translate(point.x, point.y)
+      this._ctx.rotate((Math.PI/180)*dir)
+      this._ctx.drawImage(img, 0 - offset.x, 0 - offset.y, width, height)
+      this._ctx.restore()
     }.bind(this)
     img.src = '../../static/images/ship.png'
   },
