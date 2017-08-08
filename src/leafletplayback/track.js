@@ -73,7 +73,7 @@ L.Playback.Track = L.Class.extend({
     var step = v * (t - t0)
     var x = startPt.x + step * cosx
     var y = startPt.y + step * sinx
-    var dir = endPt.x >= startPt.x ? (Math.PI*0.5 + Math.asin(sinx)) * 180 / Math.PI : (Math.PI*1.5 - Math.asin(sinx)) * 180 / Math.PI
+    var dir = endPt.x >= startPt.x ? (Math.PI*0.5 - Math.asin(sinx)) * 180 / Math.PI : (Math.PI*1.5 + Math.asin(sinx)) * 180 / Math.PI
     return {
       lng: x,
       lat: y,
