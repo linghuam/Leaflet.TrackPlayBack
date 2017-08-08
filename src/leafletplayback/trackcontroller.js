@@ -4,7 +4,7 @@ L.Playback = L.Playback || {}
 
 L.Playback.TrackController = L.Class.extend({
 
-  initialize: function (map, tracks, drawContext, options) {
+  initialize: function (map, tracks, draw, options) {
     this.options = options || {}
 
     this._map = map
@@ -14,7 +14,7 @@ L.Playback.TrackController = L.Class.extend({
     this._minTime = null
     this._maxTime = null
 
-    this._draw = drawContext
+    this._draw = draw
 
     if(tracks && tracks.length) {
       for(let i = 0, len = tracks.length; i < len; i++) {
@@ -62,7 +62,7 @@ L.Playback.TrackController = L.Class.extend({
     for (let i = 0, len = this._tracks.length ; i < len; i++) {
       let track = this._tracks[i]
       let tps = track.getTrackPointsBeforeTime (time) 
-      this._draw.drawTrack(tps)
+      if (tps && tps.length) this._draw.drawTrack(tps)
     }
   }
 

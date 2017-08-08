@@ -7,8 +7,8 @@ L.Control.PlayBack = L.Control.extend({
 
   options: {
     position: 'topright',
-    speed: 13,
-    Max_Speed: 20,
+    speed: 20,
+    Max_Speed: 60,
     trackLineOptions: { weight: 2, color: '#ef0300', renderer: L.svg() }, // 轨迹线配置
     OriginCircleOptions: { stroke: false, color: '#ef0300', fillColor: '#ef0300', fillOpacity: 1, radius: 4, renderer: L.svg() }, // 轨迹点配置
     layer: {
@@ -36,6 +36,7 @@ L.Control.PlayBack = L.Control.extend({
   initialize: function (options) {
     L.Control.prototype.initialize.call(this, options)
     this._data = options.data || {}
+    this._canvas = options.canvas
   },
 
   onAdd: function (map) {
@@ -46,7 +47,7 @@ L.Control.PlayBack = L.Control.extend({
   },
 
   onRemove: function (map) {
-    this._trackController.clearTracks()
+    L.DomUtil.remove(this._canvas)
   },
 
   getControlHtml: function () {
@@ -155,13 +156,13 @@ L.Control.PlayBack = L.Control.extend({
         var track = new L.Playback.Track(map, data[i], this.options)
         tracks.push(track)
       }
-
-      var trackController = this._trackController = new L.Playback.TrackController(map, tracks, this.options)
+      var draw = new L.Playback.Draw(this._canvas, map)
+      var trackController = this._trackController = new L.Playback.TrackController(map, tracks, draw, this.options)
       this._playbackClock = new L.Playback.Clock(trackController, this._clockCallback.bind(this), this.options)
 
       this._operateObjs.speed.html('X' + this.options.speed)
       this.setTime()
-      this._playbackClock.setCursor(this.getStartTime())
+      // this._playbackClock.setCursor(this.getStartTime())
     }
   },
 
@@ -186,15 +187,15 @@ L.Control.PlayBack = L.Control.extend({
   },
 
   getCurTime: function () {
-    return this._playbackClock.getTime()
+    return this._playbackClock.getCurTime()
   },
 
-  _clockCallback: function (ms) {
-        // 更新时间
-    var time = L.Playback.Util.getTimeStrFromUnix(ms)
+  _clockCallback: function (s) {
+    // 更新时间
+    var time = L.Playback.Util.getTimeStrFromUnix(s)
     this._operateObjs.curTime.html(time)
-        // 更新时间轴
-    this._operateObjs.range.val(ms)
+    // 更新时间轴
+    this._operateObjs.range.val(s)
   },
 
   _dataTransform: function (data) {
