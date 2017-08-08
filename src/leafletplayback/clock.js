@@ -4,28 +4,52 @@ L.Playback = L.Playback || {}
 
 L.Playback.Clock = L.Class.extend({
 
-  options: {
-    intervalTime: 100,
-    speed: 1
-  },
-
   initialize: function (trackController, callback, options) {
     this._trackController = trackController
-    L.setOptions(options, this)
+    L.setOptions(this, options)
+    this._endTime = this._trackController.getMaxTime()
+    this._curTime = this._trackController.getMinTime()
+    this._speed = this.options.speed ? this.options.speed : 0
+    this._intervalTime = this.options.intervalTime || 100
+    this._callback = callback || function () {}
+  },
+
+  _tick: function () {
+    this._curTime += Math.pow(2,this._speed)
+    if (this._curTime >= this._endTime) {
+      this._curTime = this._endTime
+      clearInterval(this._intervalID)
+    }
+    this._trackController.drawTrackByTime(this._curTime)    
+    this._callback(this._curTime)
   },
   
   start: function () {
-
-    var endTime = this._trackController.getMaxTime()
-    var curTime = this._trackController.getMinTime()
-
+    if (this._intervalID) return;
+    this._intervalID = window.setInterval(this._tick.bind(this), this._intervalTime)
   },
 
-  stop : function () {},  
+  stop : function () {
+    if (!this._intervalID) return;
+    clearInterval(this._intervalID);
+    this._intervalID = null;
+  },  
 
-  quickSpeed: function () {},
+  getSpeed: function () {
+    return this._speed
+  },
 
-  slowSpeed: function () {}
+  isPlaying: function () {
+    return this._intervalID ? true : false
+  },
+
+  setSpeed: function (speed) {
+    this._speed = speed
+    if (this._intervalID) {
+      this.stop()
+      this.start()
+    }
+  }
 
 })
 
