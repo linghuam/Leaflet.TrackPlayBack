@@ -10,7 +10,9 @@ L.Playback.Track = L.Class.extend({
     this.options = options || {}
     
     if(dataObj.timePosList && dataObj.timePosList.length) {
-        for(var i = 0, len = dataObj.timePosList.length; i < len; i++) {
+        for(let i = 0, len = dataObj.timePosList.length; i < len; i++) {
+          // isOrigin标记是否属于原始点
+          dataObj.timePosList[i].isOrigin = true 
           this.addTrackPoint(dataObj.timePosList[i])
         }
     }
@@ -48,7 +50,8 @@ L.Playback.Track = L.Class.extend({
     var startPt = this.getStartTrackPoint()
     var endPt = this.getEndTrackPoint()
     var times = this.getTimes()
-    if (time < startPt.time || time > endPt.time) return;
+    if (time < startPt.time || time > endPt.time) return ;
+    if (this.getTrackPointByTime(time)) return this.getTrackPointByTime(time) ;
     var left = 0
     var right = times.length - 1 
     var n = undefined
@@ -73,9 +76,9 @@ L.Playback.Track = L.Class.extend({
     return {
       lng: x,
       lat: y,
+      isOrigin: false,
       time: time
     }
-
   },
 
   getTrackPointsBeforeTime: function (time) {

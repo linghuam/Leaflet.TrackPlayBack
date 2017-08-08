@@ -50,11 +50,31 @@ L.Playback.Draw = L.Class.extend({
       let tpi = this._map.latLngToLayerPoint(L.latLng(trackpoints[i].lat, trackpoints[i].lng))
       this._ctx.lineTo(tpi.x, tpi.y)
     }
-    this._ctx.stroke();
+    this._ctx.stroke()
+    // 画船
+    this.drawShip(trackpoints[trackpoints.length-1])
     // 画经过的轨迹点
     for(let i = 0, len = trackpoints.length; i < len; i++) {
-      this.drawPoint(L.latLng(trackpoints[i].lat, trackpoints[i].lng));
+      if(trackpoints[i].isOrigin) {
+        this.drawPoint(L.latLng(trackpoints[i].lat, trackpoints[i].lng))
+      }
     }
+  },
+
+  drawShip: function (trackpoint) {
+    var point = this._map.latLngToLayerPoint(L.latLng(trackpoint.lat, trackpoint.lng))
+    var dir = trackpoint.dir 
+    var width = 12
+    var height = 25
+    var offset = {
+      x: width/2,
+      y: height/2
+    }
+    var img = new Image()
+    img.onload = function () {
+      this._ctx.drawImage(img, point.x - offset.x, point.y - offset.y, width, height)
+    }.bind(this)
+    img.src = '../../static/images/ship.png'
   },
 
   color: function () {
