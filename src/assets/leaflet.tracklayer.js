@@ -28,6 +28,10 @@ L.TrackLayer = L.Renderer.extend({
     return this._container
   },
 
+  getBounds: function () {
+    return this._bounds
+  },
+
   _update: function () {
     if(this._map._animatingZoom && this._bounds) {
       return;
@@ -57,5 +61,7 @@ L.TrackLayer = L.Renderer.extend({
 
     // Tell paths to redraw themselves
     this.fire('update');
+
+    // if(this._draw) this._draw();
   }
 });

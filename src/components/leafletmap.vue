@@ -10,39 +10,40 @@ import '../assets/control.playback'
 import Data from '../assets/data/1.json'
 
 export default {
-  data () {
+  data() {
     return {
       map: null
     }
   },
-  mounted () {
+  mounted() {
     this.initMap()
   },
   methods: {
-    initMap () {
+    initMap() {
       this.map = L.map('leaflet-map').setView([36, 116], 4)
       L.tileLayer.GoogleLayer().addTo(this.map)
       var layer = new L.TrackLayer().addTo(this.map);
       L.control.playback({
         data: Data,
-        canvas: layer.getContainer()
+        trackLayer: layer
       }).addTo(this.map)
-      // L.marker([36, 116]).addTo(this.map)
     }
   }
 }
+
 </script>
 
 <style lang="scss" scoped>
 @import url('http://cdn.bootcss.com/leaflet/1.0.0-rc.3/leaflet.css');
-#leaflet-map{
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+#leaflet-map {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
+
 </style>
