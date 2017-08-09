@@ -48,6 +48,7 @@ L.Playback.Track = L.Class.extend({
 
   getCalculateTrackPointByTime: function (time) {
     // 先判断最后一个点是否为原始点
+    var endpoint = this.getTrackPointByTime(time)
     var startPt = this.getStartTrackPoint()
     var endPt = this.getEndTrackPoint()
     var times = this.getTimes()
@@ -67,6 +68,12 @@ L.Playback.Track = L.Class.extend({
     startPt = L.point(this.getTrackPointByTime(t0).lng, this.getTrackPointByTime(t0).lat)
     endPt = L.point(this.getTrackPointByTime(t1).lng, this.getTrackPointByTime(t1).lat)
     var s = startPt.distanceTo(endPt);
+    // 【只有一个点】 和 【不同时间在同一个点情形】
+    if (s <= 0 || t1 === t0) {
+      endpoint = this.getTrackPointByTime(t1)
+      endpoint.time = time
+      return endpoint
+    }
     var v = s / (t1 - t0)
     var sinx = (endPt.y - startPt.y) / s
     var cosx = (endPt.x - startPt.x) / s
@@ -75,7 +82,6 @@ L.Playback.Track = L.Class.extend({
     var y = startPt.y + step * sinx
     var dir = endPt.x >= startPt.x ? (Math.PI * 0.5 - Math.asin(sinx)) * 180 / Math.PI : (Math.PI * 1.5 + Math.asin(sinx)) * 180 / Math.PI
 
-    var endpoint = this.getTrackPointByTime(time)
     if (endpoint) {
       if (endpoint.dir === undefined) { endpoint.dir = dir }
     } else {

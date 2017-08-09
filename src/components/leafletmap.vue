@@ -10,16 +10,16 @@ import '../assets/control.playback'
 import Data from '../assets/data/2.json'
 
 export default {
-  data() {
+  data () {
     return {
       map: null
     }
   },
-  mounted() {
+  mounted () {
     this.initMap()
   },
   methods: {
-    initMap() {
+    initMap () {
       this.map = L.map('leaflet-map').setView([36, 116], 4)
       L.tileLayer.GoogleLayer().addTo(this.map)
       var layer = new L.TrackLayer().addTo(this.map);
