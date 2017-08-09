@@ -7,7 +7,7 @@ import L from 'leaflet'
 import '../assets/leaflet.googlelayer'
 import '../assets/leaflet.tracklayer'
 import '../assets/control.playback'
-import Data from '../assets/data/1.json'
+import Data from '../assets/data/3.json'
 
 export default {
   data() {
