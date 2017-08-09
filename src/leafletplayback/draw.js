@@ -14,7 +14,7 @@ L.Playback.Draw = L.Class.extend({
   },
 
   trackLayerDraw: function () {
-    if(this._bufferTracks.length) {
+    if (this._bufferTracks.length) {
       this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
       this._bufferTracks.forEach(function (element, index) {
         this.drawTrack(element, false)
@@ -40,22 +40,22 @@ L.Playback.Draw = L.Class.extend({
   },
 
   drawTrack: function (trackpoints, isbuffer) {
-    if(isbuffer === undefined) isbuffer = true
-    if(isbuffer) this._bufferTracks.push(trackpoints)
+    if (isbuffer === undefined) isbuffer = true
+    if (isbuffer) this._bufferTracks.push(trackpoints)
     var tp0 = this._map.latLngToLayerPoint(L.latLng(trackpoints[0].lat, trackpoints[0].lng))
     this._ctx.beginPath()
     // 画轨迹线
     this._ctx.moveTo(tp0.x, tp0.y)
-    for(let i = 1, len = trackpoints.length; i < len; i++) {
+    for (let i = 1, len = trackpoints.length; i < len; i++) {
       let tpi = this._map.latLngToLayerPoint(L.latLng(trackpoints[i].lat, trackpoints[i].lng))
       this._ctx.lineTo(tpi.x, tpi.y)
     }
     this._ctx.stroke()
     // 画船
-    this.drawShip(trackpoints[trackpoints.length-1])
+    this.drawShip(trackpoints[trackpoints.length - 1])
     // 画经过的轨迹点
-    for(let i = 0, len = trackpoints.length; i < len; i++) {
-      if(trackpoints[i].isOrigin) {
+    for (let i = 0, len = trackpoints.length; i < len; i++) {
+      if (trackpoints[i].isOrigin) {
         this.drawPoint(L.latLng(trackpoints[i].lat, trackpoints[i].lng))
       }
     }
@@ -63,18 +63,42 @@ L.Playback.Draw = L.Class.extend({
 
   drawShip: function (trackpoint) {
     var point = this._map.latLngToLayerPoint(L.latLng(trackpoint.lat, trackpoint.lng))
-    var dir = trackpoint.dir 
+    var rotate = trackpoint.dir
+    var w = 12
+    var h = 24
+    var dh = h / 3
+
+    this._ctx.save()
+    this._ctx.fillStyle = '#f00'
+    this._ctx.strokeStyle = '#00f'
+    this._ctx.translate(point.x, point.y)
+    this._ctx.rotate((Math.PI / 180) * rotate)
+    this._ctx.beginPath()
+    this._ctx.moveTo(0, 0 - h / 2)
+    this._ctx.lineTo(0 - w / 2, 0 - h / 2 + dh)
+    this._ctx.lineTo(0 - w / 2, 0 + h / 2)
+    this._ctx.lineTo(0 + w / 2, 0 + h / 2)
+    this._ctx.lineTo(0 + w / 2, 0 - h / 2 + dh)
+    this._ctx.lineTo(0, 0 - h / 2)
+    this._ctx.fill()
+    this._ctx.stroke()
+    this._ctx.restore()
+  },
+
+  drawShip2: function (trackpoint) {
+    var point = this._map.latLngToLayerPoint(L.latLng(trackpoint.lat, trackpoint.lng))
+    var dir = trackpoint.dir
     var width = 12
     var height = 25
     var offset = {
-      x: width/2,
-      y: height/2
+      x: width / 2,
+      y: height / 2
     }
     var img = new Image()
     img.onload = function () {
       this._ctx.save()
       this._ctx.translate(point.x, point.y)
-      this._ctx.rotate((Math.PI/180)*dir)
+      this._ctx.rotate((Math.PI / 180) * dir)
       this._ctx.drawImage(img, 0 - offset.x, 0 - offset.y, width, height)
       this._ctx.restore()
     }.bind(this)
@@ -94,7 +118,7 @@ L.Playback.Draw = L.Class.extend({
 
   clear: function () {
     var bounds = this._trackLayer.getBounds()
-    if(bounds) {
+    if (bounds) {
       var size = bounds.getSize();
       this._ctx.clearRect(bounds.min.x, bounds.min.y, size.x, size.y);
     } else {
