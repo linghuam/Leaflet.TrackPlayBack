@@ -16,8 +16,8 @@ L.Playback.TrackController = L.Class.extend({
 
     this._draw = draw
 
-    if(tracks && tracks.length) {
-      for(let i = 0, len = tracks.length; i < len; i++) {
+    if (tracks && tracks.length) {
+      for (let i = 0, len = tracks.length; i < len; i++) {
         this.addTrack(tracks[i])
       }
     }
@@ -34,7 +34,7 @@ L.Playback.TrackController = L.Class.extend({
   },
 
   addTrack: function (track) {
-    if(track) {
+    if (track) {
       this._tracks.push(track)
       this.updateTime()
     }
@@ -59,9 +59,9 @@ L.Playback.TrackController = L.Class.extend({
 
   drawTrackByTime: function (time) {
     this._draw.clear()
-    for (let i = 0, len = this._tracks.length ; i < len; i++) {
+    for (let i = 0, len = this._tracks.length; i < len; i++) {
       let track = this._tracks[i]
-      let tps = track.getTrackPointsBeforeTime (time) 
+      let tps = track.getTrackPointsBeforeTime(time)
       if (tps && tps.length) this._draw.drawTrack(tps)
     }
   }

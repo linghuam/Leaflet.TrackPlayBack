@@ -9,8 +9,8 @@ L.Playback.Track = L.Class.extend({
     this._trackPoints = []
     this.options = options || {}
 
-    if(dataObj.timePosList && dataObj.timePosList.length) {
-      for(let i = 0, len = dataObj.timePosList.length; i < len; i++) {
+    if (dataObj.timePosList && dataObj.timePosList.length) {
+      for (let i = 0, len = dataObj.timePosList.length; i < len; i++) {
         // isOrigin标记是否属于原始点
         dataObj.timePosList[i].isOrigin = true
         this.addTrackPoint(dataObj.timePosList[i])
@@ -24,7 +24,7 @@ L.Playback.Track = L.Class.extend({
 
   getTimes: function () {
     var times = []
-    for(let i = 0, len = this._trackPoints.length; i < len; i++) {
+    for (let i = 0, len = this._trackPoints.length; i < len; i++) {
       times.push(this._trackPoints[i].time)
     }
     return times;
@@ -39,8 +39,8 @@ L.Playback.Track = L.Class.extend({
   },
 
   getTrackPointByTime: function (time) {
-    for(let i = 0, len = this._trackPoints.length; i < len; i++) {
-      if(this._trackPoints[i].time === time) {
+    for (let i = 0, len = this._trackPoints.length; i < len; i++) {
+      if (this._trackPoints[i].time === time) {
         return this._trackPoints[i]
       }
     }
@@ -51,13 +51,13 @@ L.Playback.Track = L.Class.extend({
     var startPt = this.getStartTrackPoint()
     var endPt = this.getEndTrackPoint()
     var times = this.getTimes()
-    if(time < startPt.time || time > endPt.time) return;
+    if (time < startPt.time || time > endPt.time) return;
     var left = 0
     var right = times.length - 1
-    var n = undefined
-    while(right - left !== 1) {
+    var n
+    while (right - left !== 1) {
       n = parseInt((left + right) / 2)
-      if(time > times[n]) left = n
+      if (time > times[n]) left = n
       else right = n
     }
 
@@ -76,8 +76,8 @@ L.Playback.Track = L.Class.extend({
     var dir = endPt.x >= startPt.x ? (Math.PI * 0.5 - Math.asin(sinx)) * 180 / Math.PI : (Math.PI * 1.5 + Math.asin(sinx)) * 180 / Math.PI
 
     var endpoint = this.getTrackPointByTime(time)
-    if(endpoint) {
-      if(endpoint.dir === undefined) { endpoint.dir = dir }
+    if (endpoint) {
+      if (endpoint.dir === undefined) { endpoint.dir = dir }
     } else {
       endpoint = {
         lng: x,
@@ -88,18 +88,17 @@ L.Playback.Track = L.Class.extend({
       }
     }
     return endpoint
-
   },
 
   getTrackPointsBeforeTime: function (time) {
     var tpoints = []
-    for(let i = 0, len = this._trackPoints.length; i < len; i++) {
-      if(this._trackPoints[i].time < time) {
+    for (let i = 0, len = this._trackPoints.length; i < len; i++) {
+      if (this._trackPoints[i].time < time) {
         tpoints.push(this._trackPoints[i])
       }
     }
     var endPt = this.getCalculateTrackPointByTime(time)
-    if(endPt) {
+    if (endPt) {
       tpoints.push(endPt)
     }
     return tpoints
