@@ -10,8 +10,17 @@ L.Playback.Draw = L.Class.extend({
     this._ctx = this._canvas.getContext('2d')
     this._map = map
     this._bufferTracks = []
+    this._trackPointFeatureGroup = L.featureGroup([]).addTo(this._map)
     this._trackLayer.on('update', this.trackLayerDraw, this)
     this._map.on('mousemove', this.onmousemoveEvt, this)
+    this.trackPointOptions = {
+          stroke: false,
+          color: '#ef0300',
+          fillColor: '#ef0300',
+          fillOpacity: 1,
+          radius: 4,
+          renderer: L.svg()
+    }
   },
 
   onmousemoveEvt: function (e) {
@@ -20,9 +29,9 @@ L.Playback.Draw = L.Class.extend({
       for(let i = 0, leni = this._bufferTracks.length; i < leni; i++) {
         for(let j = 0, len = this._bufferTracks[i].length; j < len; j++) {
           let tpoint = this._map.latLngToLayerPoint(L.latLng(this._bufferTracks[i][j].lat, this._bufferTracks[i][j].lng))
-          if (point.distanceTo(tpoint) <= 5) {
-             alert ('aaaa')
-             return ;
+          if(point.distanceTo(tpoint) <= 5) {
+            alert('aaaa')
+            return;
           }
         }
       }
@@ -31,7 +40,8 @@ L.Playback.Draw = L.Class.extend({
 
   trackLayerDraw: function () {
     if(this._bufferTracks.length) {
-      this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
+      this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height)
+      this._trackPointFeatureGroup.clearLayers()
       this._bufferTracks.forEach(function (element, index) {
         this.drawTrack(element, false)
       }.bind(this));
@@ -63,7 +73,7 @@ L.Playback.Draw = L.Class.extend({
     // 画船
     this.drawShip(trackpoints[trackpoints.length - 1])
     // 画经过的轨迹点
-    this.drarTrackPoints(trackpoints)
+    this.drawTrackPoints2(trackpoints)
   },
 
   drawTrackLine: function (trackpoints) {
@@ -80,7 +90,7 @@ L.Playback.Draw = L.Class.extend({
     this._ctx.restore()
   },
 
-  drarTrackPoints: function (trackpoints) {
+  drawTrackPoints: function (trackpoints) {
     this._ctx.save()
     for(let i = 0, len = trackpoints.length; i < len; i++) {
       if(trackpoints[i].isOrigin) {
@@ -93,6 +103,40 @@ L.Playback.Draw = L.Class.extend({
       }
     }
     this._ctx.restore()
+  },
+
+  drawTrackPoints2: function (trackpoints) {
+    for(let i = 0, len = trackpoints.length; i < len; i++) {
+      if(trackpoints[i].isOrigin) {
+        let latLng = L.latLng(trackpoints[i].lat, trackpoints[i].lng)
+        let cricleMarker = L.circleMarker(latLng, this.trackPointOptions)
+        cricleMarker.bindTooltip(this.getTooltipText(trackpoints[i]), this.getTooltipOptions())
+        this._trackPointFeatureGroup.addLayer(cricleMarker)
+      }
+    }
+  },
+
+  getTooltipText: function (targetobj) {
+    var content = [];
+    content.push('<table>');
+    content.push('<tr><td>批号:</td><td>' + targetobj.info_ph + '</td></tr>');
+    content.push('<tr><td>经度:</td><td>' + targetobj.info_lng + '</td></tr>');
+    content.push('<tr><td>纬度:</td><td>' + targetobj.info_lat + '</td></tr>');
+    content.push('<tr><td>时间:</td><td>' + targetobj.info_time + '</td></tr>');
+    content.push('<tr><td>航向:</td><td>' + targetobj.info_dir + '</td></tr>');
+    content.push('<tr><td>航艏向:</td><td>' + targetobj.info_heading + '</td></tr>');
+    content.push('<tr><td>航速:</td><td>' + targetobj.info_speed + '</td></tr>');
+    content.push('</table>');
+    content = content.join('');
+    return content;
+  },
+
+  getTooltipOptions: function () {
+    return {
+      offset: [0, 0],
+      direction: 'top',
+      permanent: false
+    };
   },
 
   drawShip: function (trackpoint) {
@@ -150,6 +194,16 @@ L.Playback.Draw = L.Class.extend({
     this._ctx.strokeStyle = gradient;
   },
 
+  removeLayer: function () {
+    if (this._map.hasLayer(this._trackLayer)){
+      this._map.removeLayer(this._trackLayer)
+    }
+    if (this._map.hasLayer(this._trackPointFeatureGroup)) {
+      // this._trackPointFeatureGroup.clearLayers()
+      this._map.removeLayer(this._trackPointFeatureGroup)
+    }
+  },
+
   clear: function () {
     var bounds = this._trackLayer.getBounds()
     if(bounds) {
@@ -157,6 +211,9 @@ L.Playback.Draw = L.Class.extend({
       this._ctx.clearRect(bounds.min.x, bounds.min.y, size.x, size.y);
     } else {
       this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
+    }
+    if (this._map.hasLayer(this._trackPointFeatureGroup)) {
+      this._trackPointFeatureGroup.clearLayers()
     }
     this._bufferTracks = []
   }

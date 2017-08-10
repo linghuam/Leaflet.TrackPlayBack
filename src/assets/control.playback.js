@@ -47,7 +47,7 @@ L.Control.PlayBack = L.Control.extend({
   },
 
   onRemove: function (map) {
-    map.removeLayer(this._trackLayer)
+    this._draw.removeLayer()
   },
 
   getControlHtml: function () {
@@ -164,8 +164,8 @@ L.Control.PlayBack = L.Control.extend({
         var track = new L.Playback.Track(map, data[i], this.options)
         tracks.push(track)
       }
-      var draw = new L.Playback.Draw(this._trackLayer, map)
-      var trackController = this._trackController = new L.Playback.TrackController(map, tracks, draw, this.options)
+      this._draw = new L.Playback.Draw(this._trackLayer, map)
+      var trackController = this._trackController = new L.Playback.TrackController(map, tracks, this._draw, this.options)
       this._playbackClock = new L.Playback.Clock(trackController, this._clockCallback.bind(this), this.options)
 
       this._operateObjs.speed.html('X' + this.options.speed)
