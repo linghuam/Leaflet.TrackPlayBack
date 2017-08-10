@@ -11,10 +11,26 @@ L.Playback.Draw = L.Class.extend({
     this._map = map
     this._bufferTracks = []
     this._trackLayer.on('update', this.trackLayerDraw, this)
+    this._map.on('mousemove', this.onmousemoveEvt, this)
+  },
+
+  onmousemoveEvt: function (e) {
+    var point = e.layerPoint
+    if(this._bufferTracks.length) {
+      for(let i = 0, leni = this._bufferTracks.length; i < leni; i++) {
+        for(let j = 0, len = this._bufferTracks[i].length; j < len; j++) {
+          let tpoint = this._map.latLngToLayerPoint(L.latLng(this._bufferTracks[i][j].lat, this._bufferTracks[i][j].lng))
+          if (point.distanceTo(tpoint) <= 5) {
+             alert ('aaaa')
+             return ;
+          }
+        }
+      }
+    }
   },
 
   trackLayerDraw: function () {
-    if (this._bufferTracks.length) {
+    if(this._bufferTracks.length) {
       this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
       this._bufferTracks.forEach(function (element, index) {
         this.drawTrack(element, false)
@@ -40,25 +56,43 @@ L.Playback.Draw = L.Class.extend({
   },
 
   drawTrack: function (trackpoints, isbuffer) {
-    if (isbuffer === undefined) isbuffer = true
-    if (isbuffer) this._bufferTracks.push(trackpoints)
+    if(isbuffer === undefined) isbuffer = true
+    if(isbuffer) this._bufferTracks.push(trackpoints)
+    // 画轨迹线
+    this.drawTrackLine(trackpoints)
+    // 画船
+    this.drawShip(trackpoints[trackpoints.length - 1])
+    // 画经过的轨迹点
+    this.drarTrackPoints(trackpoints)
+  },
+
+  drawTrackLine: function (trackpoints) {
     var tp0 = this._map.latLngToLayerPoint(L.latLng(trackpoints[0].lat, trackpoints[0].lng))
+    this._ctx.save()
     this._ctx.beginPath()
     // 画轨迹线
     this._ctx.moveTo(tp0.x, tp0.y)
-    for (let i = 1, len = trackpoints.length; i < len; i++) {
+    for(let i = 1, len = trackpoints.length; i < len; i++) {
       let tpi = this._map.latLngToLayerPoint(L.latLng(trackpoints[i].lat, trackpoints[i].lng))
       this._ctx.lineTo(tpi.x, tpi.y)
     }
     this._ctx.stroke()
-    // 画船
-    this.drawShip(trackpoints[trackpoints.length - 1])
-    // 画经过的轨迹点
-    for (let i = 0, len = trackpoints.length; i < len; i++) {
-      if (trackpoints[i].isOrigin) {
-        this.drawPoint(L.latLng(trackpoints[i].lat, trackpoints[i].lng))
+    this._ctx.restore()
+  },
+
+  drarTrackPoints: function (trackpoints) {
+    this._ctx.save()
+    for(let i = 0, len = trackpoints.length; i < len; i++) {
+      if(trackpoints[i].isOrigin) {
+        let latLng = L.latLng(trackpoints[i].lat, trackpoints[i].lng)
+        let radius = 2
+        let point = this._map.latLngToLayerPoint(latLng)
+        this._ctx.beginPath()
+        this._ctx.arc(point.x, point.y, radius, 0, Math.PI * 2, false)
+        this._ctx.fill()
       }
     }
+    this._ctx.restore()
   },
 
   drawShip: function (trackpoint) {
@@ -79,7 +113,7 @@ L.Playback.Draw = L.Class.extend({
     this._ctx.lineTo(0 - w / 2, 0 + h / 2)
     this._ctx.lineTo(0 + w / 2, 0 + h / 2)
     this._ctx.lineTo(0 + w / 2, 0 - h / 2 + dh)
-    this._ctx.lineTo(0, 0 - h / 2)
+    this._ctx.closePath()
     this._ctx.fill()
     this._ctx.stroke()
     this._ctx.restore()
@@ -118,7 +152,7 @@ L.Playback.Draw = L.Class.extend({
 
   clear: function () {
     var bounds = this._trackLayer.getBounds()
-    if (bounds) {
+    if(bounds) {
       var size = bounds.getSize();
       this._ctx.clearRect(bounds.min.x, bounds.min.y, size.x, size.y);
     } else {
