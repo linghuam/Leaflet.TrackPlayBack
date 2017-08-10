@@ -30,12 +30,20 @@ L.Playback.Draw = L.Class.extend({
         for(let j = 0, len = this._bufferTracks[i].length; j < len; j++) {
           let tpoint = this._map.latLngToLayerPoint(L.latLng(this._bufferTracks[i][j].lat, this._bufferTracks[i][j].lng))
           if(point.distanceTo(tpoint) <= 5) {
-            alert('aaaa')
+            this.OpenPopup(this._bufferTracks[i][j])
             return;
           }
         }
       }
     }
+  },
+
+  OpenPopup: function (trackpoint) {
+    var latlng = L.latLng(trackpoint.lat, trackpoint.lng)
+    var tooltip = L.tooltip(this.getTooltipOptions())
+    tooltip.setTooltipContent(this.getTooltipText(trackpoint))
+    tooltip.openTooltip(latlng)
+    tooltip.addTo(this._map)
   },
 
   trackLayerDraw: function () {
@@ -73,7 +81,7 @@ L.Playback.Draw = L.Class.extend({
     // 画船
     this.drawShip(trackpoints[trackpoints.length - 1])
     // 画经过的轨迹点
-    this.drawTrackPoints2(trackpoints)
+    this.drawTrackPoints(trackpoints)
   },
 
   drawTrackLine: function (trackpoints) {
