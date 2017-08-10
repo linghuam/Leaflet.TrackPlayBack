@@ -1,4 +1,4 @@
-window.requestNextAnimationFrame = 
+window.requestAnimationFrame = 
 (function () {
 	var originalWebkitMethod,
 		wrapper = undefined,
