@@ -7,8 +7,8 @@ L.Control.PlayBack = L.Control.extend({
 
   options: {
     position: 'topright',
-    speed: 20,
-    Max_Speed: 60,
+    speed: 1,
+    Max_Speed: 15,
     trackLineOptions: { weight: 2, color: '#ef0300', renderer: L.svg() }, // 轨迹线配置
     OriginCircleOptions: { stroke: false, color: '#ef0300', fillColor: '#ef0300', fillOpacity: 1, radius: 4, renderer: L.svg() }, // 轨迹点配置
     layer: {
@@ -229,7 +229,7 @@ L.Control.PlayBack = L.Control.extend({
         var pj = data[i].posList[j]
         obj.lng = pj.lo / 600000
         obj.lat = pj.la / 600000
-        obj.time = pj.ti * 1000
+        obj.time = pj.ti // 以秒为单位
         obj.dir = parseFloat(pj.co / 10)
         obj.heading = parseFloat(pj.he)
         obj.speed = parseFloat(pj.sp / 10)

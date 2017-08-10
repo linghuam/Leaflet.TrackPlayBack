@@ -5,7 +5,7 @@ L.Playback = L.Playback || {}
 L.Playback.Util = {
    /* 根据unix时间戳获取时间字符串 */
   getTimeStrFromUnix: function (time) {
-    time = parseInt(time)
+    time = parseInt(time*1000)
     if (isNaN(time)) {
       return ''
     }

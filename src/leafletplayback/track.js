@@ -56,6 +56,10 @@ L.Playback.Track = L.Class.extend({
     var left = 0
     var right = times.length - 1
     var n
+    // 处理只有一个点情况
+    if (left === right) {
+       return endpoint 
+    }
     while (right - left !== 1) {
       n = parseInt((left + right) / 2)
       if (time > times[n]) left = n
@@ -68,8 +72,8 @@ L.Playback.Track = L.Class.extend({
     startPt = L.point(this.getTrackPointByTime(t0).lng, this.getTrackPointByTime(t0).lat)
     endPt = L.point(this.getTrackPointByTime(t1).lng, this.getTrackPointByTime(t1).lat)
     var s = startPt.distanceTo(endPt);
-    // 【只有一个点】 和 【不同时间在同一个点情形】
-    if (s <= 0 || t1 === t0) {
+    // 【不同时间在同一个点情形】
+    if (s <= 0) {
       endpoint = this.getTrackPointByTime(t1)
       endpoint.time = time
       return endpoint
