@@ -38,6 +38,10 @@ L.Control.PlayBack = L.Control.extend({
 
   getControlHtml: function () {
     var html = []
+    html.push('<div class="optionsDiv">')
+    html.push('<label><input type="checkbox" class="isshowpoint">显示轨迹点</label>')
+    html.push('<label><input type="checkbox" class="isshowline">显示轨迹线</label>')
+    html.push('</div>')
     html.push('<div class="operateContainer">')
     html.push('<span class="btn-play glyphicon glyphicon-play" title="播放"></span>')
     html.push('<span class="btn-restart glyphicon glyphicon-repeat" title="重播"></span>')
@@ -67,6 +71,8 @@ L.Control.PlayBack = L.Control.extend({
     $container.html(this.getControlHtml())
 
     this._operateObjs = {
+      isshowpoint: $container.find('.isshowpoint'),
+      isshowline: $container.find('.isshowline'),
       play: $container.find('.btn-play'),
       restart: $container.find('.btn-restart'),
       slow: $container.find('.btn-slow'),
@@ -81,6 +87,8 @@ L.Control.PlayBack = L.Control.extend({
   },
 
   _initEvts: function () {
+    L.DomEvent.on(this._operateObjs.isshowpoint.get(0), 'change', this._isshowpoint, this)
+    L.DomEvent.on(this._operateObjs.isshowline.get(0), 'change', this._isshowline, this)
     L.DomEvent.on(this._operateObjs.play.get(0), 'click', this._play, this)
     L.DomEvent.on(this._operateObjs.restart.get(0), 'click', this._restart, this)
     L.DomEvent.on(this._operateObjs.slow.get(0), 'click', this._slow, this)
@@ -90,6 +98,24 @@ L.Control.PlayBack = L.Control.extend({
       .on(this._operateObjs.range.get(0), 'click', L.DomEvent.preventDefault)
       .on(this._operateObjs.range.get(0), 'change', this._scrollchange, this)
       .on(this._operateObjs.range.get(0), 'mousemove', this._scrollchange, this)
+  },
+
+  _isshowpoint: function (e) {
+    if (e.target.checked) {
+      this._playback.draw.options.trackPointOptions.isDraw = true
+    } else {
+      this._playback.draw.options.trackPointOptions.isDraw = false
+    }
+    this._playback.draw.update()
+  },
+
+  _isshowline: function (e) {
+    if (e.target.checked) {
+      this._playback.draw.options.trackLineOptions.isDraw = true
+    } else {
+      this._playback.draw.options.trackLineOptions.isDraw = false
+    }
+    this._playback.draw.update()
   },
 
   _play: function () {

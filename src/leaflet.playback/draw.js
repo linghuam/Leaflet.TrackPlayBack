@@ -5,6 +5,7 @@ export var Draw = L.Class.extend({
 
   options: {
     trackPointOptions: {
+      isDraw: false,
       useCanvas: true,
       stroke: false,
       color: '#ef0300',
@@ -13,6 +14,7 @@ export var Draw = L.Class.extend({
       radius: 4
     },
     trackLineOptions: {
+      isDraw: false,
       stroke: true,
       color: '#1C54E2', // stroke color
       weight: 2,
@@ -22,8 +24,8 @@ export var Draw = L.Class.extend({
     shipOptions: {
       useImg: false,
       imgUrl: '../../static/images/ship.png',
-      width: 12,
-      height: 24,
+      width: 8,
+      height: 18,
       color: '#00f', // stroke color
       fillColor: '#9FD12D'
     },
@@ -47,6 +49,10 @@ export var Draw = L.Class.extend({
     this._map.on('mousemove', this._onmousemoveEvt, this)
   },
 
+  update: function () {
+    this._trackLayerUpdate()
+  },
+
   _trackLayerUpdate: function () {
     if (this._bufferTracks.length) {
       this._clearLayer()
@@ -57,6 +63,9 @@ export var Draw = L.Class.extend({
   },
 
   _onmousemoveEvt: function (e) {
+    if (!this.options.trackPointOptions.isDraw) {
+      return
+    }
     var point = e.layerPoint
     if (this._bufferTracks.length) {
       for (let i = 0, leni = this._bufferTracks.length; i < leni; i++) {
@@ -89,7 +98,9 @@ export var Draw = L.Class.extend({
 
   _drawTrack: function (trackpoints) {
     // 画轨迹线
-    this._drawTrackLine(trackpoints)
+    if (this.options.trackLineOptions.isDraw) {
+      this._drawTrackLine(trackpoints)
+    }
     // 画船
     if (this.options.shipOptions.useImg) {
       this._drawShip2(trackpoints[trackpoints.length - 1])
@@ -97,29 +108,18 @@ export var Draw = L.Class.extend({
       this._drawShip(trackpoints[trackpoints.length - 1])
     }
     // 画经过的轨迹点
-    if (this.options.trackPointOptions.useCanvas) {
-      this._drawTrackPoints(trackpoints)
-    } else {
-      this._drawTrackPoints2(trackpoints)
+    if (this.options.trackPointOptions.isDraw) {
+      if (this.options.trackPointOptions.useCanvas) {
+        this._drawTrackPoints(trackpoints)
+      } else {
+        this._drawTrackPoints2(trackpoints)
+      }
     }
   },
 
   drawTrack: function (trackpoints) {
     this._bufferTracks.push(trackpoints)
-    // 画轨迹线
-    this._drawTrackLine(trackpoints)
-    // 画船
-    if (this.options.shipOptions.useImg) {
-      this._drawShip2(trackpoints[trackpoints.length - 1])
-    } else {
-      this._drawShip(trackpoints[trackpoints.length - 1])
-    }
-    // 画经过的轨迹点
-    if (this.options.trackPointOptions.useCanvas) {
-      this._drawTrackPoints(trackpoints)
-    } else {
-      this._drawTrackPoints2(trackpoints)
-    }
+    this._drawTrack(trackpoints)
   },
 
   _drawTrackLine: function (trackpoints) {

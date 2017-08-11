@@ -19,6 +19,8 @@ export var TrackController = L.Class.extend({
     }
 
     this._update()
+
+    this._caculateCount()
   },
 
   getMinTime: function () {
@@ -60,7 +62,18 @@ export var TrackController = L.Class.extend({
         }
       }
     }
+  },
+
+  _caculateCount: function () {
+    var shipCount = this._tracks.length
+    var pointCount = 0
+    for (let i = 0, len = shipCount; i < len; i++) {
+      pointCount += this._tracks[i]._trackPoints.length
+    }
+    console.log('共有: ' + shipCount + '艘船;')
+    console.log('共有: ' + pointCount + '个轨迹点;')
   }
+
 })
 
 export var trackController = function (tracks, draw, options) {
