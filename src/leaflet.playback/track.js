@@ -66,13 +66,15 @@ export var Track = L.Class.extend({
     var t0 = times[left]
     var t1 = times[right]
     var t = time
+    if (!this.getTrackPointByTime(t0)){
+      console.log('error');
+    }
     startPt = L.point(this.getTrackPointByTime(t0).lng, this.getTrackPointByTime(t0).lat)
     endPt = L.point(this.getTrackPointByTime(t1).lng, this.getTrackPointByTime(t1).lat)
     var s = startPt.distanceTo(endPt);
     // 不同时间在同一个点情形
     if (s <= 0) {
       endpoint = this.getTrackPointByTime(t1)
-      endpoint.time = time
       return endpoint
     }
     var v = s / (t1 - t0)

@@ -14,8 +14,8 @@ export var Draw = L.Class.extend({
     },
     trackLineOptions: {
       stroke: true,
-      color: '#000', // stroke color
-      weight: 3,
+      color: '#1C54E2', // stroke color
+      weight: 2,
       fill: false,
       fillColor: '#000'
     },
@@ -62,7 +62,7 @@ export var Draw = L.Class.extend({
       for (let i = 0, leni = this._bufferTracks.length; i < leni; i++) {
         for (let j = 0, len = this._bufferTracks[i].length; j < len; j++) {
           let tpoint = this._map.latLngToLayerPoint(L.latLng(this._bufferTracks[i][j].lat, this._bufferTracks[i][j].lng))
-          if (point.distanceTo(tpoint) <= 3) {
+          if (point.distanceTo(tpoint) <= this.options.trackPointOptions.radius) {
             this._opentoolTip(this._bufferTracks[i][j])
             return;
           }
