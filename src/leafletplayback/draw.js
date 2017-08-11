@@ -29,21 +29,30 @@ L.Playback.Draw = L.Class.extend({
       for(let i = 0, leni = this._bufferTracks.length; i < leni; i++) {
         for(let j = 0, len = this._bufferTracks[i].length; j < len; j++) {
           let tpoint = this._map.latLngToLayerPoint(L.latLng(this._bufferTracks[i][j].lat, this._bufferTracks[i][j].lng))
-          if(point.distanceTo(tpoint) <= 5) {
+          if(point.distanceTo(tpoint) <= 3) {
             this.OpenPopup(this._bufferTracks[i][j])
             return;
           }
         }
       }
     }
+    if (this._map.hasLayer(this._tooltip)) {
+      this._map.removeLayer(this._tooltip)
+    }   
+    this._canvas.style.cursor = 'pointer' 
   },
 
   OpenPopup: function (trackpoint) {
+    this._canvas.style.cursor = 'default'
+    if (this._map.hasLayer(this._tooltip)) {
+      this._map.removeLayer(this._tooltip)
+    }
     var latlng = L.latLng(trackpoint.lat, trackpoint.lng)
-    var tooltip = L.tooltip(this.getTooltipOptions())
-    tooltip.setTooltipContent(this.getTooltipText(trackpoint))
-    tooltip.openTooltip(latlng)
+    var tooltip = this._tooltip = L.tooltip(this.getTooltipOptions())
+    tooltip.setLatLng(latlng)    
     tooltip.addTo(this._map)
+    tooltip.setContent(this.getTooltipText(trackpoint))
+    
   },
 
   trackLayerDraw: function () {
@@ -155,7 +164,7 @@ L.Playback.Draw = L.Class.extend({
     var dh = h / 3
 
     this._ctx.save()
-    this._ctx.fillStyle = '#f00'
+    this._ctx.fillStyle = '#9FD12D'
     this._ctx.strokeStyle = '#00f'
     this._ctx.translate(point.x, point.y)
     this._ctx.rotate((Math.PI / 180) * rotate)
