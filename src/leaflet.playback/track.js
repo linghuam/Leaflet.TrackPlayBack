@@ -1,25 +1,26 @@
 import L from 'leaflet'
 
-L.Playback = L.Playback || {}
+export var Track = L.Class.extend({
 
-L.Playback.Track = L.Class.extend({
+  initialize: function (dataObj, options) {
+    L.setOptions(this, options)
 
-  initialize: function (map, dataObj, options) {
-    this._map = map
     this._trackPoints = []
-    this.options = options || {}
-
+    this._timeTick = {}
     if (dataObj.timePosList && dataObj.timePosList.length) {
       for (let i = 0, len = dataObj.timePosList.length; i < len; i++) {
         // isOrigin标记是否属于原始点
         dataObj.timePosList[i].isOrigin = true
-        this.addTrackPoint(dataObj.timePosList[i])
+        this._trackPoints.push(dataObj.timePosList[i])
       }
+      this._update()
     }
   },
 
   addTrackPoint: function (trackPoint) {
-    this._trackPoints.push(trackPoint);
+    trackPoint.isOrigin = true
+    this._trackPoints.push(trackPoint)
+    this._update()
   },
 
   getTimes: function () {
@@ -39,11 +40,7 @@ L.Playback.Track = L.Class.extend({
   },
 
   getTrackPointByTime: function (time) {
-    for (let i = 0, len = this._trackPoints.length; i < len; i++) {
-      if (this._trackPoints[i].time === time) {
-        return this._trackPoints[i]
-      }
-    }
+    return this._timeTick[time]
   },
 
   getCalculateTrackPointByTime: function (time) {
@@ -58,7 +55,7 @@ L.Playback.Track = L.Class.extend({
     var n
     // 处理只有一个点情况
     if (left === right) {
-       return endpoint 
+      return endpoint
     }
     while (right - left !== 1) {
       n = parseInt((left + right) / 2)
@@ -72,7 +69,7 @@ L.Playback.Track = L.Class.extend({
     startPt = L.point(this.getTrackPointByTime(t0).lng, this.getTrackPointByTime(t0).lat)
     endPt = L.point(this.getTrackPointByTime(t1).lng, this.getTrackPointByTime(t1).lat)
     var s = startPt.distanceTo(endPt);
-    // 【不同时间在同一个点情形】
+    // 不同时间在同一个点情形
     if (s <= 0) {
       endpoint = this.getTrackPointByTime(t1)
       endpoint.time = time
@@ -112,6 +109,34 @@ L.Playback.Track = L.Class.extend({
       tpoints.push(endPt)
     }
     return tpoints
-  }
+  },
 
+  _update: function () {
+    this._sortTrackPointsByTime()
+    this._updatetimeTick()
+  },
+
+  _sortTrackPointsByTime: function () {
+    var len = this._trackPoints.length
+    for (let i = 0; i < len; i++) {
+      for (let j = 0; j < len - 1 - i; j++) {
+        if (this._trackPoints[j].time > this._trackPoints[j + 1].time) {
+          let tmp = this._trackPoints[j + 1]
+          this._trackPoints[j + 1] = this._trackPoints[j]
+          this._trackPoints[j] = tmp
+        }
+      }
+    }
+  },
+
+  _updatetimeTick: function () {
+    this._timeTick = {}
+    for (let i = 0, len = this._trackPoints.length; i < len; i++) {
+      this._timeTick[this._trackPoints[i].time] = this._trackPoints[i]
+    }
+  }
 })
+
+export var track = function (dataObj, options) {
+  return new Track(dataObj, options)
+}

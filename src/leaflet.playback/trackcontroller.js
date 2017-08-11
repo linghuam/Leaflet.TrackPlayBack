@@ -1,13 +1,9 @@
 import L from 'leaflet'
 
-L.Playback = L.Playback || {}
+export var TrackController = L.Class.extend({
 
-L.Playback.TrackController = L.Class.extend({
-
-  initialize: function (map, tracks, draw, options) {
-    this.options = options || {}
-
-    this._map = map
+  initialize: function (tracks, draw, options) {
+    L.setOptions(this, options)
 
     this._tracks = []
 
@@ -18,11 +14,11 @@ L.Playback.TrackController = L.Class.extend({
 
     if (tracks && tracks.length) {
       for (let i = 0, len = tracks.length; i < len; i++) {
-        this.addTrack(tracks[i])
+        this._tracks.push(tracks[i])
       }
     }
 
-    this.updateTime()
+    this._update()
   },
 
   getMinTime: function () {
@@ -36,11 +32,20 @@ L.Playback.TrackController = L.Class.extend({
   addTrack: function (track) {
     if (track) {
       this._tracks.push(track)
-      this.updateTime()
+      this._update()
     }
   },
 
-  updateTime: function () {
+  drawTracksByTime: function (time) {
+    this._draw.clear()
+    for (let i = 0, len = this._tracks.length; i < len; i++) {
+      let track = this._tracks[i]
+      let tps = track.getTrackPointsBeforeTime(time)
+      if (tps && tps.length) this._draw.drawTrack(tps)
+    }
+  },
+
+  _update: function () {
     if (this._tracks.length) {
       this._minTime = this._tracks[0].getStartTrackPoint().time
       this._maxTime = this._tracks[0].getEndTrackPoint().time
@@ -55,15 +60,9 @@ L.Playback.TrackController = L.Class.extend({
         }
       }
     }
-  },
-
-  drawTrackByTime: function (time) {
-    this._draw.clear()
-    for (let i = 0, len = this._tracks.length; i < len; i++) {
-      let track = this._tracks[i]
-      let tps = track.getTrackPointsBeforeTime(time)
-      if (tps && tps.length) this._draw.drawTrack(tps)
-    }
   }
-
 })
+
+export var trackController = function (tracks, draw, options) {
+  return new TrackController(tracks, draw, options)
+}

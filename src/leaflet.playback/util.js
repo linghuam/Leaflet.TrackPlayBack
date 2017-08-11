@@ -1,16 +1,11 @@
-import L from 'leaflet'
-
-L.Playback = L.Playback || {}
-
-L.Playback.Util = {
-   /* 根据unix时间戳获取时间字符串 */
+export var Util = {
+   /* 根据unix时间戳(单位:秒)获取时间字符串 */
   getTimeStrFromUnix: function (time) {
-    time = parseInt(time*1000)
+    time = parseInt(time * 1000)
     if (isNaN(time)) {
       return ''
     }
     var newDate = new Date(time)
-            // var newDate = new Date(time);
     var year = newDate.getFullYear()
     var month = (newDate.getMonth() + 1) < 10 ? '0' + (newDate.getMonth() + 1) : newDate.getMonth() + 1
     var day = newDate.getDate() < 10 ? '0' + newDate.getDate() : newDate.getDate()

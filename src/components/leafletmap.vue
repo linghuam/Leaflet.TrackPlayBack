@@ -5,8 +5,7 @@
 <script>
 import L from 'leaflet'
 import '../assets/leaflet.googlelayer'
-import '../assets/leaflet.tracklayer'
-import '../assets/control.playback'
+import '../control.playback/control.playback'
 import Data from '../assets/data/2.json'
 
 export default {
@@ -22,10 +21,8 @@ export default {
     initMap () {
       this.map = L.map('leaflet-map').setView([36, 116], 4)
       L.tileLayer.GoogleLayer().addTo(this.map)
-      var layer = new L.TrackLayer().addTo(this.map);
       L.control.playback({
-        data: Data,
-        trackLayer: layer
+        data: Data
       }).addTo(this.map)
     }
   }

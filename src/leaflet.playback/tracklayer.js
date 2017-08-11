@@ -1,6 +1,6 @@
 import L from 'leaflet'
 
-L.TrackLayer = L.Renderer.extend({
+export var TrackLayer = L.Renderer.extend({
 
   initialize: function (options) {
     L.Renderer.prototype.initialize.call(this, options);
@@ -8,7 +8,6 @@ L.TrackLayer = L.Renderer.extend({
   },
 
   onAdd: function (map) {
-
     this._container = L.DomUtil.create('canvas', 'leaflet-zoom-animated');
     this._container.setAttribute('id', 'canvas');
 
@@ -33,7 +32,7 @@ L.TrackLayer = L.Renderer.extend({
   },
 
   _update: function () {
-    if(this._map._animatingZoom && this._bounds) {
+    if (this._map._animatingZoom && this._bounds) {
       return;
     }
 
@@ -52,7 +51,7 @@ L.TrackLayer = L.Renderer.extend({
     container.style.width = size.x + 'px';
     container.style.height = size.y + 'px';
 
-    if(L.Browser.retina) {
+    if (L.Browser.retina) {
       this._ctx.scale(2, 2);
     }
 
@@ -61,7 +60,5 @@ L.TrackLayer = L.Renderer.extend({
 
     // Tell paths to redraw themselves
     this.fire('update');
-
-    // if(this._draw) this._draw();
   }
 });

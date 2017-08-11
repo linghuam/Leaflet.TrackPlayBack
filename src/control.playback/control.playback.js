@@ -1,27 +1,13 @@
 import L from 'leaflet'
 import $ from 'jquery'
-import './leafletplayback'
+import {PlayBack, playback} from '../leaflet.playback/index'
 import './control.playback.css'
 
 L.Control.PlayBack = L.Control.extend({
 
   options: {
     position: 'topright',
-    speed: 1,
-    Max_Speed: 15,
-    trackLineOptions: { weight: 2, color: '#ef0300', renderer: L.svg() }, // 轨迹线配置
-    OriginCircleOptions: { stroke: false, color: '#ef0300', fillColor: '#ef0300', fillOpacity: 1, radius: 4, renderer: L.svg() }, // 轨迹点配置
-    layer: {
-      // pointToLayer(featureData, latlng)
-    },
-
-    marker: { // marker options
-      icon: L.icon({
-        iconUrl: '../../static/images/ship.png',
-        iconSize: [12, 25],
-        iconAnchor: [5, 12] // 解析后：margin-left:-5px;margin-top:-12px;
-      })
-    }
+    data: {}
   },
 
   bootstrapIconClass: {
@@ -35,8 +21,8 @@ L.Control.PlayBack = L.Control.extend({
 
   initialize: function (options) {
     L.Control.prototype.initialize.call(this, options)
-    this._data = options.data || {}
-    this._trackLayer = options.trackLayer
+    this._data = this.options.data
+    this._playback = {}
   },
 
   onAdd: function (map) {
@@ -47,7 +33,7 @@ L.Control.PlayBack = L.Control.extend({
   },
 
   onRemove: function (map) {
-    this._draw.removeLayer()
+    this._playback.draw.removeLayer()
   },
 
   getControlHtml: function () {
@@ -73,7 +59,7 @@ L.Control.PlayBack = L.Control.extend({
     var className = 'leaflet-control-playback'
     this._container = L.DomUtil.create('div', className)
 
-    if(L.DomEvent) {
+    if (L.DomEvent) {
       L.DomEvent.disableClickPropagation(this._container)
     }
 
@@ -108,43 +94,42 @@ L.Control.PlayBack = L.Control.extend({
 
   _play: function () {
     var $this = this._operateObjs.play
-    if($this.hasClass(this.bootstrapIconClass.play)) {
+    if ($this.hasClass(this.bootstrapIconClass.play)) {
       $this.removeClass(this.bootstrapIconClass.play)
       $this.addClass(this.bootstrapIconClass.stop)
       $this.attr('title', '停止')
-      this._playbackClock.start()
+      this._playback.clock.start()
     } else {
       $this.removeClass(this.bootstrapIconClass.stop)
       $this.addClass(this.bootstrapIconClass.play)
       $this.attr('title', '播放')
-      this._playbackClock.stop()
+      this._playback.clock.stop()
     }
   },
 
   _restart: function () {
-    //播放开始改变播放按钮样式
-    var $play = this._operateObjs.play
+    var $play = this._operateObjs.play  // 播放开始改变播放按钮样式
     $play.removeClass(this.bootstrapIconClass.play)
     $play.addClass(this.bootstrapIconClass.stop)
     $play.attr('title', '停止')
-    this._playbackClock.rePlaying()
+    this._playback.clock.rePlaying()
   },
 
   _slow: function () {
-    this._playbackClock.slowSpeed()
-    var sp = this._playbackClock.getSpeed()
+    this._playback.clock.slowSpeed()
+    var sp = this._playback.clock.getSpeed()
     this._operateObjs.speed.html('X' + sp)
   },
 
   _quick: function () {
-    this._playbackClock.quickSpeed()
-    var sp = this._playbackClock.getSpeed()
+    this._playback.clock.quickSpeed()
+    var sp = this._playback.clock.getSpeed()
     this._operateObjs.speed.html('X' + sp)
   },
 
   _close: function () {
     L.DomUtil.remove(this._container)
-    if(this.onRemove) {
+    if (this.onRemove) {
       this.onRemove(this._map)
     }
     return this
@@ -152,32 +137,32 @@ L.Control.PlayBack = L.Control.extend({
 
   _scrollchange: function (e) {
     var val = Number(e.target.value)
-    this._playbackClock.setCursor(val)
+    this._playback.clock.setCursor(val)
   },
 
   _update: function () {
     var map = this._map
     var data = this._dataTransform(this._data.msg.shipList)
-    if(map && data) {
+    if (map && data) {
       var tracks = []
-      for(var i = 0, len = data.length; i < len; i++) {
-        var track = new L.Playback.Track(map, data[i], this.options)
+      for (var i = 0, len = data.length; i < len; i++) {
+        var track = new PlayBack.Track(data[i], this.options)
         tracks.push(track)
       }
-      this._draw = new L.Playback.Draw(this._trackLayer, map)
-      var trackController = this._trackController = new L.Playback.TrackController(map, tracks, this._draw, this.options)
-      this._playbackClock = new L.Playback.Clock(trackController, this._clockCallback.bind(this), this.options)
+      this._playback.draw = new PlayBack.Draw(map, this.options)
+      this._playback.trackController = new PlayBack.TrackController(tracks, this._playback.draw, this.options)
+      this._playback.clock = new PlayBack.Clock(this._playback.trackController, this._clockCallback.bind(this), this.options)
 
-      this._operateObjs.speed.html('X' + this.options.speed)
+      this._operateObjs.speed.html('X' + this._playback.clock.getSpeed())
       this.setTime()
-      this._playbackClock.setCursor(this.getStartTime())
+      this._playback.clock.setCursor(this.getStartTime())
     }
   },
 
   setTime: function () {
-    var startTime = L.Playback.Util.getTimeStrFromUnix(this.getStartTime())
-    var endTime = L.Playback.Util.getTimeStrFromUnix(this.getEndTime())
-    var curTime = L.Playback.Util.getTimeStrFromUnix(this.getCurTime())
+    var startTime = PlayBack.Util.getTimeStrFromUnix(this.getStartTime())
+    var endTime = PlayBack.Util.getTimeStrFromUnix(this.getEndTime())
+    var curTime = PlayBack.Util.getTimeStrFromUnix(this.getCurTime())
     this._operateObjs.startTime.html(startTime)
     this._operateObjs.endTime.html(endTime)
     this._operateObjs.curTime.html(curTime)
@@ -187,44 +172,44 @@ L.Control.PlayBack = L.Control.extend({
   },
 
   getStartTime: function () {
-    return this._playbackClock.getStartTime()
+    return this._playback.clock.getStartTime()
   },
 
   getEndTime: function () {
-    return this._playbackClock.getEndTime()
+    return this._playback.clock.getEndTime()
   },
 
   getCurTime: function () {
-    return this._playbackClock.getCurTime()
+    return this._playback.clock.getCurTime()
   },
 
   _clockCallback: function (s) {
     // 更新时间
-    var time = L.Playback.Util.getTimeStrFromUnix(s)
+    var time = PlayBack.Util.getTimeStrFromUnix(s)
     this._operateObjs.curTime.html(time)
     // 更新时间轴
     this._operateObjs.range.val(s)
-    //播放结束后改变播放按钮样式
-    if(s >= this.getEndTime()) {
+    // 播放结束后改变播放按钮样式
+    if (s >= this.getEndTime()) {
       var $play = this._operateObjs.play
       $play.removeClass(this.bootstrapIconClass.stop)
       $play.addClass(this.bootstrapIconClass.play)
       $play.attr('title', '播放')
-      this._playbackClock.stop()
+      this._playback.clock.stop()
     }
   },
 
   _dataTransform: function (data) {
-    if(!data || !data.length) {
+    if (!data || !data.length) {
       console.log('playback_error:data transform error!')
       return
     }
     var datas = []
-    for(var i = 0, len = data.length; i < len; i++) {
+    for (var i = 0, len = data.length; i < len; i++) {
       var ph = data[i].num
       var dataobj = {}
       dataobj.timePosList = []
-      for(var j = 0, lenj = data[i].posList.length; j < lenj; j++) {
+      for (var j = 0, lenj = data[i].posList.length; j < lenj; j++) {
         var obj = {}
         var pj = data[i].posList[j]
         obj.lng = pj.lo / 600000
