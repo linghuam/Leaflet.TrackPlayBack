@@ -6,7 +6,7 @@
 import L from 'leaflet'
 import '../assets/leaflet.googlelayer'
 import '../control.playback/control.playback'
-import Data from '../assets/data/2.json'
+import Data from '../assets/data/3.json'
 
 export default {
   data () {
