@@ -6,7 +6,7 @@
 import L from 'leaflet'
 import '../assets/leaflet.googlelayer'
 import '../control.playback/control.playback'
-import Data from '../assets/data/1.json'
+import Data from '../assets/data/3.json'
 
 export default {
   data () {
@@ -19,7 +19,7 @@ export default {
   },
   methods: {
     initMap () {
-      this.map = L.map('leaflet-map').setView([36, 116], 4)
+      this.map = L.map('leaflet-map').setView([34, 133], 8)
       L.tileLayer.GoogleLayer().addTo(this.map)
       L.control.playback({
         data: Data

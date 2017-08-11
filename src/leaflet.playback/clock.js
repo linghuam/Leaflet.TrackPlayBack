@@ -4,7 +4,7 @@ import './requestanimationframe.js'
 export var Clock = L.Class.extend({
 
   options: {
-    speed: 1,
+    speed: 13,
     maxSpeed: 65
   },
 

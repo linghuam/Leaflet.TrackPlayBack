@@ -1,13 +1,11 @@
-# Leaflet-TrackPlayback-Control 
+# Leaflet-TrackPlayback-Control
 
-V2.0.0版本(vuejs实现)
+基于leaflet+canvas+vuejs实现的海上船舶轨迹回放插件，支持轨迹的播放、暂停、快进、快退操作以及上万个轨迹点的显示和上千条轨迹的回放。
 
-基于leaflet实现的海上船舶轨迹回放插件，支持轨迹的播放、暂停、快进、快退操作。兼容leaflet V1+。
-
-[查看Demo](https://linghuam.github.io/TrackPlayback/src/index.html)
+[查看Demo](https://linghuam.github.io/TrackPlayback/dist/index.html)
 
 ## Remind
-说明：该库来源于[SituationPlayback](https://github.com/linghuam/SituationPlayback)（已弃用），将会在该库完成轨迹回放功能，并完善成各个版本。
+说明：该库来源于[~~SituationPlayback~~](https://github.com/linghuam/SituationPlayback)（已弃用），将会在该库完成轨迹回放功能，并完善成各个版本。
 
 ## Build Setup
 
@@ -63,6 +61,6 @@ For detailed explanation on how things work, checkout the [guide](http://vuejs-t
 * [WebGIS中使用ZRender实现轨迹前端动态播放特效](http://www.cnblogs.com/naaoveGIS/p/6718822.html)
 
 
-## License 
+## License
 
 [MIT license](https://opensource.org/licenses/mit-license.php)
