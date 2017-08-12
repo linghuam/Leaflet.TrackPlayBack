@@ -3,6 +3,7 @@
 </template>
 
 <script>
+import '../assets/leafletcss/leaflet.css'
 import L from 'leaflet'
 import '../assets/leaflet.googlelayer'
 import '../control.playback/control.playback'
@@ -31,7 +32,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import url('http://cdn.bootcss.com/leaflet/1.0.0-rc.3/leaflet.css');
+// @import url('http://cdn.bootcss.com/leaflet/1.0.0-rc.3/leaflet.css');
+// @import url('../assets/leafletcss/leaflet.css');
 #leaflet-map {
   position: absolute;
   left: 0;

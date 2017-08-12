@@ -226,13 +226,14 @@ export var Draw = L.Class.extend({
   getTooltipText: function (targetobj) {
     var content = [];
     content.push('<table>');
-    content.push('<tr><td>批号:</td><td>' + targetobj.info_ph + '</td></tr>');
-    content.push('<tr><td>经度:</td><td>' + targetobj.info_lng + '</td></tr>');
-    content.push('<tr><td>纬度:</td><td>' + targetobj.info_lat + '</td></tr>');
-    content.push('<tr><td>时间:</td><td>' + targetobj.info_time + '</td></tr>');
-    content.push('<tr><td>航向:</td><td>' + targetobj.info_dir + '</td></tr>');
-    content.push('<tr><td>航艏向:</td><td>' + targetobj.info_heading + '</td></tr>');
-    content.push('<tr><td>航速:</td><td>' + targetobj.info_speed + '</td></tr>');
+    if (targetobj.info && targetobj.info.length) {
+      for (let i = 0, len = targetobj.info.length; i < len; i++) {
+        content.push('<tr>')
+        content.push('<td>' + targetobj.info[i].key + '</td>')
+        content.push('<td>' + targetobj.info[i].value + '</td>')
+        content.push('</tr>')
+      }
+    }
     content.push('</table>');
     content = content.join('');
     return content;

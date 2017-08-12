@@ -1,13 +1,42 @@
 # Leaflet-TrackPlayback-Control
 
+## Introduce
+
 基于leaflet+canvas+vuejs实现的海上船舶轨迹回放插件，支持轨迹的播放、暂停、快进、快退操作以及上万个轨迹点的显示和上千条轨迹的回放。
+
+![效果图1](./static/images/1.png)
+
+![效果图2](./static/images/2.png)
+
+
+## Example
 
 [查看Demo](https://linghuam.github.io/TrackPlayback/dist/index.html)
 
-## Remind
-说明：该库来源于[~~SituationPlayback~~](https://github.com/linghuam/SituationPlayback)（已弃用），将会在该库完成轨迹回放功能，并完善成各个版本。
+``` javascript
+// 调用代码
+import L from 'leaflet'
+import '../assets/leaflet.googlelayer'
+import '../control.playback/control.playback'
+import Data from '../assets/data/3.json'
 
-## Build Setup
+export default {
+  mounted () {
+    this.initMap()
+  },
+  methods: {
+    initMap () {
+      this.map = L.map('leaflet-map').setView([34, 133], 8)
+      L.tileLayer.GoogleLayer().addTo(this.map)
+      L.control.playback({
+        data: Data
+      }).addTo(this.map)
+    }
+  }
+}
+```
+
+## Usage
 
 ``` bash
 # install dependencies
@@ -34,29 +63,38 @@ npm test
 
 For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
 
-## Data
-采用geojson格式数据
+
+## Custome your Data
+
+you can change the method '_dataTransform' in 'src/control.playback/control.playback.js'
+
+to transform data to standard format like this.
+
 ```
-{
-  "type": "Feature",
-  "geometry": {
-    "type": "MultiPoint",
-    "coordinates": [/*array of [lng,lat] coordinates*/]
+// standard format data
+[
+  {
+    timePosList: [{lat:30, lng:116, time:1502529980, dir:320, heading:300, info:[]}, ....]
   },
-  "properties": {
-    "time": [/*array of UNIX timestamps*/]
-  }
-}
+  {
+    timePosList: [{lat:30, lng:116, time:1502529980, dir:320, heading:300, info:[]}, ....]
+  },
+  {
+    timePosList: [{lat:30, lng:116, time:1502529980, dir:320, heading:300, info:[]}, ....]
+  }...
+]
+
 ```
 
 ## Problem
-* 时间轴不能连续读秒，而是根据数据时间间隔变化，用户体验不好。
-* 播放过程中缩放地图如果动画还在继续，船舶无法立即回到原位。
-* 没有采用插值算法，而是根据真实数据播放，有时播放效果较差。但是采用插值算法，又会产生数据量过大问题。
 
-### 以上问题自己正在思索解决，如果有好的解决建议,[欢迎提问](https://github.com/linghuam/TrackPlayback/issues)
+如果您有好的建议或意见,[欢迎提问](https://github.com/linghuam/TrackPlayback/issues)
 
-## 拓展阅读
+
+## Recommend
+
+* [HTML5 Canvas核心技术(书籍)](https://book.douban.com/subject/24533314/)
+* [html5 canvas教程](http://www.w3cplus.com/blog/tags/616.html?page=1)
 * [曲线轨迹动画原理](http://www.tuicool.com/articles/zaeQf22)
 * [WebGIS中使用ZRender实现轨迹前端动态播放特效](http://www.cnblogs.com/naaoveGIS/p/6718822.html)
 

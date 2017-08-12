@@ -238,19 +238,20 @@ L.Control.PlayBack = L.Control.extend({
       for (var j = 0, lenj = data[i].posList.length; j < lenj; j++) {
         var obj = {}
         var pj = data[i].posList[j]
-        obj.lng = pj.lo / 600000
-        obj.lat = pj.la / 600000
-        obj.time = pj.ti // 以秒为单位
-        obj.dir = parseFloat(pj.co / 10)
-        obj.heading = parseFloat(pj.he)
-        obj.speed = parseFloat(pj.sp / 10)
-        obj.info_ph = ph
-        obj.info_lng = PlayBack.Util.latlngTodfmStr(obj.lat, 'lng')
-        obj.info_lat = PlayBack.Util.latlngTodfmStr(obj.lat, 'lat')
-        obj.info_time = PlayBack.Util.getTimeStrFromUnix(pj.ti)
-        obj.info_dir = (pj.co / 10).toFixed(1) + '°'
-        obj.info_heading = parseFloat(pj.he).toFixed(1) + '°'
-        obj.info_speed = parseFloat(pj.sp / 10).toFixed(1) + '节'
+        obj.lng = pj.lo / 600000 // 经度 【必须参数】
+        obj.lat = pj.la / 600000 // 纬度 【必须参数】
+        obj.time = pj.ti // 以秒为单位的unix时间戳 【必须参数】
+        obj.dir = parseFloat(pj.co / 10) // 航向 0-360度
+        obj.heading = parseFloat(pj.he) // 航艏向 0-360度
+        obj.info = [ // 轨迹点信息
+          {key: '批号', value: ph},
+          {key: '经度', value: PlayBack.Util.latlngTodfmStr(obj.lat, 'lng')},
+          {key: '纬度', value: PlayBack.Util.latlngTodfmStr(obj.lat, 'lat')},
+          {key: '时间', value: PlayBack.Util.getTimeStrFromUnix(pj.ti)},
+          {key: '航向', value: (pj.co / 10).toFixed(1) + '°'},
+          {key: '航艏向', value: parseFloat(pj.he).toFixed(1) + '°'},
+          {key: '航速', value: parseFloat(pj.sp / 10).toFixed(1) + '节'}
+        ]
         dataobj.timePosList.push(obj)
       }
       datas.push(dataobj)
