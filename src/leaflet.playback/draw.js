@@ -1,9 +1,8 @@
-import L from 'leaflet'
+// import L from 'leaflet'
 import {TrackLayer} from './tracklayer'
 
 export var Draw = L.Class.extend({
 
-  options: {
     trackPointOptions: {
       isDraw: false,
       useCanvas: true,
@@ -11,6 +10,7 @@ export var Draw = L.Class.extend({
       color: '#ef0300',
       fill: true,
       fillColor: '#ef0300',
+      opacity:0.3,
       radius: 4
     },
     trackLineOptions: {
@@ -19,7 +19,8 @@ export var Draw = L.Class.extend({
       color: '#1C54E2', // stroke color
       weight: 2,
       fill: false,
-      fillColor: '#000'
+      fillColor: '#000',
+      opacity:0.3
     },
     shipOptions: {
       useImg: false,
@@ -33,11 +34,14 @@ export var Draw = L.Class.extend({
       offset: [0, 0],
       direction: 'top',
       permanent: false
-    }
-  },
+    },
 
   initialize: function (map, options) {
-    L.setOptions(this, options)
+    // L.setOptions(this, options) //无法执行深拷贝
+    this.trackPointOptions = L.extend(this.trackPointOptions, options.trackPointOptions)
+    this.trackLineOptions = L.extend(this.trackLineOptions, options.trackLineOptions)
+    this.shipOptions = L.extend(this.shipOptions, options.shipOptions)
+    this.toolTipOptions = L.extend(this.toolTipOptions, options.toolTipOptions)
     this._map = map
     this._trackLayer = new TrackLayer().addTo(map)
     this._canvas = this._trackLayer.getContainer()
@@ -63,7 +67,7 @@ export var Draw = L.Class.extend({
   },
 
   _onmousemoveEvt: function (e) {
-    if (!this.options.trackPointOptions.isDraw) {
+    if (!this.trackPointOptions.isDraw) {
       return
     }
     var point = e.layerPoint
@@ -71,7 +75,7 @@ export var Draw = L.Class.extend({
       for (let i = 0, leni = this._bufferTracks.length; i < leni; i++) {
         for (let j = 0, len = this._bufferTracks[i].length; j < len; j++) {
           let tpoint = this._map.latLngToLayerPoint(L.latLng(this._bufferTracks[i][j].lat, this._bufferTracks[i][j].lng))
-          if (point.distanceTo(tpoint) <= this.options.trackPointOptions.radius) {
+          if (point.distanceTo(tpoint) <= this.trackPointOptions.radius) {
             this._opentoolTip(this._bufferTracks[i][j])
             return;
           }
@@ -90,7 +94,7 @@ export var Draw = L.Class.extend({
     }
     this._canvas.style.cursor = 'default'
     var latlng = L.latLng(trackpoint.lat, trackpoint.lng)
-    var tooltip = this._tooltip = L.tooltip(this.options.toolTipOptions)
+    var tooltip = this._tooltip = L.tooltip(this.toolTipOptions)
     tooltip.setLatLng(latlng)
     tooltip.addTo(this._map)
     tooltip.setContent(this.getTooltipText(trackpoint))
@@ -98,18 +102,18 @@ export var Draw = L.Class.extend({
 
   _drawTrack: function (trackpoints) {
     // 画轨迹线
-    if (this.options.trackLineOptions.isDraw) {
+    if (this.trackLineOptions.isDraw) {
       this._drawTrackLine(trackpoints)
     }
     // 画船
-    if (this.options.shipOptions.useImg) {
+    if (this.shipOptions.useImg) {
       this._drawShip2(trackpoints[trackpoints.length - 1])
     } else {
       this._drawShip(trackpoints[trackpoints.length - 1])
     }
     // 画经过的轨迹点
-    if (this.options.trackPointOptions.isDraw) {
-      if (this.options.trackPointOptions.useCanvas) {
+    if (this.trackPointOptions.isDraw) {
+      if (this.trackPointOptions.useCanvas) {
         this._drawTrackPoints(trackpoints)
       } else {
         this._drawTrackPoints2(trackpoints)
@@ -123,16 +127,17 @@ export var Draw = L.Class.extend({
   },
 
   _drawTrackLine: function (trackpoints) {
-    var options = this.options.trackLineOptions
+    var options = this.trackLineOptions
     var tp0 = this._map.latLngToLayerPoint(L.latLng(trackpoints[0].lat, trackpoints[0].lng))
     this._ctx.save()
-    this._ctx.beginPath()
+    this._ctx.beginPath()    
     // 画轨迹线
     this._ctx.moveTo(tp0.x, tp0.y)
     for (let i = 1, len = trackpoints.length; i < len; i++) {
       let tpi = this._map.latLngToLayerPoint(L.latLng(trackpoints[i].lat, trackpoints[i].lng))
       this._ctx.lineTo(tpi.x, tpi.y)
     }
+    this._ctx.globalAlpha = options.opacity;
     if (options.stroke) {
       this._ctx.strokeStyle = options.color
       this._ctx.lineWidth = options.weight
@@ -146,7 +151,7 @@ export var Draw = L.Class.extend({
   },
 
   _drawTrackPoints: function (trackpoints) {
-    var options = this.options.trackPointOptions
+    var options = this.trackPointOptions
     this._ctx.save()
     for (let i = 0, len = trackpoints.length; i < len; i++) {
       if (trackpoints[i].isOrigin) {
@@ -155,6 +160,7 @@ export var Draw = L.Class.extend({
         let point = this._map.latLngToLayerPoint(latLng)
         this._ctx.beginPath()
         this._ctx.arc(point.x, point.y, radius, 0, Math.PI * 2, false)
+        this._ctx.globalAlpha = options.opacity;
         if (options.stroke) {
           this._ctx.strokeStyle = options.color
           this._ctx.stroke()
@@ -172,8 +178,8 @@ export var Draw = L.Class.extend({
     for (let i = 0, len = trackpoints.length; i < len; i++) {
       if (trackpoints[i].isOrigin) {
         let latLng = L.latLng(trackpoints[i].lat, trackpoints[i].lng)
-        let cricleMarker = L.circleMarker(latLng, this.options.trackPointOptions)
-        cricleMarker.bindTooltip(this.getTooltipText(trackpoints[i]), this.options.toolTipOptions)
+        let cricleMarker = L.circleMarker(latLng, this.trackPointOptions)
+        cricleMarker.bindTooltip(this.getTooltipText(trackpoints[i]), this.toolTipOptions)
         this._trackPointFeatureGroup.addLayer(cricleMarker)
       }
     }
@@ -182,13 +188,13 @@ export var Draw = L.Class.extend({
   _drawShip: function (trackpoint) {
     var point = this._map.latLngToLayerPoint(L.latLng(trackpoint.lat, trackpoint.lng))
     var rotate = trackpoint.dir || 0
-    var w = this.options.shipOptions.width
-    var h = this.options.shipOptions.height
+    var w = this.shipOptions.width
+    var h = this.shipOptions.height
     var dh = h / 3
 
     this._ctx.save()
-    this._ctx.fillStyle = this.options.shipOptions.fillColor
-    this._ctx.strokeStyle = this.options.shipOptions.color
+    this._ctx.fillStyle = this.shipOptions.fillColor
+    this._ctx.strokeStyle = this.shipOptions.color
     this._ctx.translate(point.x, point.y)
     this._ctx.rotate((Math.PI / 180) * rotate)
     this._ctx.beginPath()
@@ -206,8 +212,8 @@ export var Draw = L.Class.extend({
   _drawShip2: function (trackpoint) {
     var point = this._map.latLngToLayerPoint(L.latLng(trackpoint.lat, trackpoint.lng))
     var dir = trackpoint.dir || 0
-    var width = this.options.shipOptions.width
-    var height = this.options.shipOptions.height
+    var width = this.shipOptions.width
+    var height = this.shipOptions.height
     var offset = {
       x: width / 2,
       y: height / 2
@@ -220,7 +226,7 @@ export var Draw = L.Class.extend({
       this._ctx.drawImage(img, 0 - offset.x, 0 - offset.y, width, height)
       this._ctx.restore()
     }.bind(this)
-    img.src = this.options.shipOptions.imgUrl
+    img.src = this.shipOptions.imgUrl
   },
 
   getTooltipText: function (targetobj) {

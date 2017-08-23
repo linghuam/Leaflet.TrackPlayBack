@@ -1,5 +1,3 @@
-import L from 'leaflet'
-
 const defaultUrl = 'http://mt{num}.google.cn/vt/lyrs={lyrs}&hl=zh-CN&gl=cn&s=Gal&z={z}&x={x}&y={y}'
 
 L.TileLayer.GoogleLayer = L.TileLayer.extend({

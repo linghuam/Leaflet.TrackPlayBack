@@ -1,4 +1,4 @@
-import L from 'leaflet'
+// import L from 'leaflet'
 
 export var TrackLayer = L.Renderer.extend({
 
@@ -9,7 +9,7 @@ export var TrackLayer = L.Renderer.extend({
 
   onAdd: function (map) {
     this._container = L.DomUtil.create('canvas', 'leaflet-zoom-animated');
-    this._container.setAttribute('id', 'canvas');
+    // this._container.setAttribute('id', 'canvas');
 
     var pane = map.getPane(this.options.pane);
     pane.appendChild(this._container);

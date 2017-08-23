@@ -1,4 +1,4 @@
-import L from 'leaflet'
+// import L from 'leaflet'
 import './requestanimationframe.js'
 
 export var Clock = L.Class.extend({

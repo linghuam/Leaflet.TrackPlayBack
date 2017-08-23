@@ -1,8 +1,3 @@
-import L from 'leaflet'
-import $ from 'jquery'
-import {PlayBack, playback} from '../leaflet.playback/index'
-import './control.playback.css'
-
 L.Control.PlayBack = L.Control.extend({
 
   options: {
@@ -102,18 +97,18 @@ L.Control.PlayBack = L.Control.extend({
 
   _isshowpoint: function (e) {
     if (e.target.checked) {
-      this._playback.draw.options.trackPointOptions.isDraw = true
+      this._playback.draw.trackPointOptions.isDraw = true
     } else {
-      this._playback.draw.options.trackPointOptions.isDraw = false
+      this._playback.draw.trackPointOptions.isDraw = false
     }
     this._playback.draw.update()
   },
 
   _isshowline: function (e) {
     if (e.target.checked) {
-      this._playback.draw.options.trackLineOptions.isDraw = true
+      this._playback.draw.trackLineOptions.isDraw = true
     } else {
-      this._playback.draw.options.trackLineOptions.isDraw = false
+      this._playback.draw.trackLineOptions.isDraw = false
     }
     this._playback.draw.update()
   },
@@ -172,12 +167,12 @@ L.Control.PlayBack = L.Control.extend({
     if (map && data) {
       var tracks = []
       for (var i = 0, len = data.length; i < len; i++) {
-        var track = new PlayBack.Track(data[i], this.options)
+        var track = new L.PlayBack.Track(data[i], this.options)
         tracks.push(track)
       }
-      this._playback.draw = new PlayBack.Draw(map, this.options)
-      this._playback.trackController = new PlayBack.TrackController(tracks, this._playback.draw, this.options)
-      this._playback.clock = new PlayBack.Clock(this._playback.trackController, this._clockCallback.bind(this), this.options)
+      this._playback.draw = new L.PlayBack.Draw(map, this.options)
+      this._playback.trackController = new L.PlayBack.TrackController(tracks, this._playback.draw, map, this.options)
+      this._playback.clock = new L.PlayBack.Clock(this._playback.trackController, this._clockCallback.bind(this), this.options)
 
       this._operateObjs.speed.html('X' + this._playback.clock.getSpeed())
       this.setTime()
@@ -186,9 +181,9 @@ L.Control.PlayBack = L.Control.extend({
   },
 
   setTime: function () {
-    var startTime = PlayBack.Util.getTimeStrFromUnix(this.getStartTime())
-    var endTime = PlayBack.Util.getTimeStrFromUnix(this.getEndTime())
-    var curTime = PlayBack.Util.getTimeStrFromUnix(this.getCurTime())
+    var startTime = L.PlayBack.Util.getTimeStrFromUnix(this.getStartTime())
+    var endTime = L.PlayBack.Util.getTimeStrFromUnix(this.getEndTime())
+    var curTime = L.PlayBack.Util.getTimeStrFromUnix(this.getCurTime())
     this._operateObjs.startTime.html(startTime)
     this._operateObjs.endTime.html(endTime)
     this._operateObjs.curTime.html(curTime)
@@ -211,7 +206,7 @@ L.Control.PlayBack = L.Control.extend({
 
   _clockCallback: function (s) {
     // 更新时间
-    var time = PlayBack.Util.getTimeStrFromUnix(s)
+    var time = L.PlayBack.Util.getTimeStrFromUnix(s)
     this._operateObjs.curTime.html(time)
     // 更新时间轴
     this._operateObjs.range.val(s)
@@ -245,9 +240,9 @@ L.Control.PlayBack = L.Control.extend({
         obj.heading = parseFloat(pj.he) // 航艏向 0-360度
         obj.info = [ // 轨迹点信息
           {key: '批号', value: ph},
-          {key: '经度', value: PlayBack.Util.latlngTodfmStr(obj.lat, 'lng')},
-          {key: '纬度', value: PlayBack.Util.latlngTodfmStr(obj.lat, 'lat')},
-          {key: '时间', value: PlayBack.Util.getTimeStrFromUnix(pj.ti)},
+          {key: '经度', value: L.PlayBack.Util.latlngTodfmStr(obj.lat, 'lng')},
+          {key: '纬度', value: L.PlayBack.Util.latlngTodfmStr(obj.lat, 'lat')},
+          {key: '时间', value: L.PlayBack.Util.getTimeStrFromUnix(pj.ti)},
           {key: '航向', value: (pj.co / 10).toFixed(1) + '°'},
           {key: '航艏向', value: parseFloat(pj.he).toFixed(1) + '°'},
           {key: '航速', value: parseFloat(pj.sp / 10).toFixed(1) + '节'}

@@ -21,3 +21,6 @@ playback.draw = draw
 PlayBack.Util = Util
 
 export {PlayBack, playback}
+
+window.L.PlayBack = PlayBack
+window.L.playback = playback

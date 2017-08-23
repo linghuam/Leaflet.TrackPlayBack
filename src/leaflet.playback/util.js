@@ -1,6 +1,12 @@
 export var Util = {
-  /* 根据unix时间戳(单位:秒)获取时间字符串 */
-  getTimeStrFromUnix: function (time) {
+  /**
+   * 根据unix时间戳(单位:秒)获取时间字符串
+   * @param  {[int]} time     [时间戳（精确到秒）]
+   * @param  {[string]} accuracy [精度，日：d, 小时：h,分钟：m,秒：s]
+   * @return {[string]}          [yy:mm:dd hh:mm:ss]
+   */
+  getTimeStrFromUnix: function (time, accuracy) {
+    accuracy = accuracy || 's'
     time = parseInt(time * 1000)
     if (isNaN(time)) {
       return ''
@@ -12,7 +18,15 @@ export var Util = {
     var hours = newDate.getHours() < 10 ? '0' + newDate.getHours() : newDate.getHours()
     var minuts = newDate.getMinutes() < 10 ? '0' + newDate.getMinutes() : newDate.getMinutes()
     var seconds = newDate.getSeconds() < 10 ? '0' + newDate.getSeconds() : newDate.getSeconds()
-    var ret = year + '-' + month + '-' + day + ' ' + hours + ':' + minuts + ':' + seconds
+    if (accuracy === 'd') {
+       var ret = year + '-' + month + '-' + day
+    } else if (accuracy === 'h') {
+       var ret = year + '-' + month + '-' + day + ' ' + hours
+     } else if (accuracy === 'm') {
+       var ret = year + '-' + month + '-' + day + ' ' + hours + ':' + minuts 
+     } else {
+       var ret = year + '-' + month + '-' + day + ' ' + hours + ':' + minuts + ':' + seconds      
+     }
     return ret
   },
 

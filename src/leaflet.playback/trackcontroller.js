@@ -1,9 +1,11 @@
-import L from 'leaflet'
+// import L from 'leaflet'
 
 export var TrackController = L.Class.extend({
 
-  initialize: function (tracks, draw, options) {
+  initialize: function (tracks, draw, map, options) {
     L.setOptions(this, options)
+
+    this._map = map;
 
     this._tracks = []
 
@@ -21,6 +23,8 @@ export var TrackController = L.Class.extend({
     this._update()
 
     this._caculateCount()
+
+    this.locateToFirstTrack()
   },
 
   getMinTime: function () {
@@ -29,6 +33,17 @@ export var TrackController = L.Class.extend({
 
   getMaxTime: function () {
     return this._maxTime
+  },
+
+  locateToFirstTrack: function () {
+    if (this._tracks.length) {
+      var track0 = this._tracks[0]
+      var spoint = track0.getStartTrackPoint();
+      if (spoint) {
+        var latlng = L.latLng(spoint.lat, spoint.lng);
+        this._map.panTo(latlng);
+      }
+    }
   },
 
   addTrack: function (track) {
