@@ -1,10 +1,7 @@
-const defaultUrl = 'http://mt{num}.google.cn/vt/lyrs={lyrs}&hl=zh-CN&gl=cn&s=Gal&z={z}&x={x}&y={y}'
-
 L.TileLayer.GoogleLayer = L.TileLayer.extend({
 
   initialize: function (url, options) {
-    url = url || defaultUrl
-    options = options || {}
+    var url = 'http://mt{num}.google.cn/vt/lyrs={lyrs}&hl=zh-CN&gl=cn&s=Gal&z={z}&x={x}&y={y}';
     L.TileLayer.prototype.initialize.call(this, url, options)
   },
 

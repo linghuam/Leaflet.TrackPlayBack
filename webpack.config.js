@@ -20,7 +20,7 @@ const config = {
   entry: __dirname + '/src/leaflet.playback/index.js',
   devtool: 'source-map',
   output: {
-    path: __dirname + '/lib',
+    path: __dirname + '/dist',
     filename: outputFile,
     library: libraryName,
     libraryTarget: 'umd',

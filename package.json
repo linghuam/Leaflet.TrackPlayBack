@@ -43,6 +43,7 @@
   },
   "homepage": "https://github.com/krasimir/webpack-library-starter",
   "dependencies": {
+    "jquery": "^3.2.1",
     "leaflet": "^1.2.0"
   }
 }
