@@ -1,4 +1,4 @@
-# Leaflet-TrackPlayback-Control
+# Leaflet-TrackPlayback
 
 ## Introduce
 
@@ -15,25 +15,13 @@
 
 ``` javascript
 // 调用代码
-import L from 'leaflet'
-import '../assets/leaflet.googlelayer'
-import '../control.playback/control.playback'
-import Data from '../assets/data/3.json'
-
-export default {
-  mounted () {
-    this.initMap()
-  },
-  methods: {
-    initMap () {
-      this.map = L.map('leaflet-map').setView([34, 133], 8)
-      L.tileLayer.GoogleLayer().addTo(this.map)
-      L.control.playback({
-        data: Data
-      }).addTo(this.map)
-    }
-  }
-}
+var map = L.map('leaflet-map').setView([34, 133], 8)
+L.tileLayer.GoogleLayer().addTo(map)
+$.getJSON('src/assets/data/3.json', function (Data) {
+  L.control.playback({
+    data: Data
+  }).addTo(map)
+})
 ```
 
 ## Usage
@@ -42,27 +30,14 @@ export default {
 # install dependencies
 npm install
 
-# serve with hot reload at localhost:8080
+# 生成 dist/LeafletPlayback.js文件
 npm run dev
 
-# build for production with minification
+# 生成 dist/LeafletPlayback.min.js文件
 npm run build
 
-# build for production and view the bundle analyzer report
-npm run build --report
-
-# run unit tests
-npm run unit
-
-# run e2e tests
-npm run e2e
-
-# run all tests
-npm test
 ```
-
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
-
+具体使用方法参照[index.html](index.html)页面
 
 ## Custome your Data
 
