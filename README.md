@@ -11,7 +11,7 @@
 
 ## Example
 
-[查看Demo](https://linghuam.github.io/TrackPlayback/dist/index.html)
+[查看Demo](https://linghuam.github.io/TrackPlayback/)
 
 ``` javascript
 // 调用代码
