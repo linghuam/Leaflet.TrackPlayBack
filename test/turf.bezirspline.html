@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+    crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js" integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
+    crossorigin=""></script>
+</head>
+
+<body>
+  <div id="mapid" style="position:absolute;left:0;top:0;right:0;bottom:0;"></div>
+  <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
+  <script>
+    var map = L.map('mapid').setView([18.427501, -76.091308], 8);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    var popup = L.popup();
+    map.on('click', function(e) {
+        popup.setLatLng(e.latlng)
+        .setContent(`[${e.latlng.lng},${e.latlng.lat}]`)
+        .openOn(map);
+    });
+    var pointArr = [
+      [-76.091308, 18.427501],
+      [-76.695556, 18.729501],
+      [-76.552734, 19.40443],
+      [-74.61914, 19.134789],
+      [-73.652343, 20.07657],
+      [-73.157958, 20.210656],
+      [ -72.982178, 20.401272],
+    //   [-72.61413574218751,20.94604992010052],
+    //   [-73.41064453125001,20.894739516479788],
+    //   [-73.37768554687501,20.74584023890227],
+    //   [-73.27880859375001,20.37552680342694],
+    //   [-73.22937011718751,20.086888505561017],
+    //   [-73.57543945312501,19.963022929830807],
+    //   [-73.77319335937501,19.828725387681168],
+    //   [-74.26757812500001,19.79254892024401],
+    //   [-74.55322265625001,19.596019240312508],
+    //   [-74.54772949218751,19.362976133341846],
+    //   [-74.66857910156251,18.984220415249755],
+    //   [-75.58593750000001,19.482128945320483],
+    //   [-74.68505859375001,20.2209657795223],
+    //   [-76.39892578125001,19.83906000930461],
+    //   [-76.8109130859375,19.497664168139053],
+    //   [-76.63513183593751,19.05173366503917],
+    //   [-76.43737792968751,18.588982352118453],
+    //   [-76.10229492187501,18.391017613499077],
+    //   [-76.091308, 18.427501]
+    ];
+    var line = turf.lineString(pointArr);
+    // var points = turf.multiPoint(pointArr);
+
+    L.geoJSON(line).addTo(map);
+    // L.geoJSON(points).addTo(map);
+
+    var curved = turf.bezierSpline(line);
+
+    var latlngs = L.GeoJSON.coordsToLatLngs(curved.geometry.coordinates);
+
+    L.geoJSON(curved, {
+        style: (fea) => {
+            return  {
+                color: '#f00'
+            }
+        }
+    }).addTo(map);
+
+    // L.polyline(latlngs, {color:'#0f0', smoothFactor: 0, noClip: true}).addTo(map);
+
+    function getPoint(latlng) {
+      return map.latLngToContainerPoint(latlng);
+    }
+
+    var marker = L.marker(latlngs[0]).addTo(map);
+    var el = marker.getElement();
+    var fx = new L.PosAnimation();
+    var len = latlngs.length;
+    var index = 1;
+    fx.on('end', () => {
+      index ++;
+      if (index >= len) {
+        fx.stop();
+        fx.off('end');
+      } else {
+        fx.run(el, getPoint(latlngs[index]), 0.05);
+      }
+    });
+    fx.run(el, getPoint(latlngs[index]), 0.05);
+
+  </script>
+</body>
+
+</html>
