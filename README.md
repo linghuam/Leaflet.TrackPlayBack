@@ -52,8 +52,8 @@ $.getJSON('src/assets/data/3.json', function (Data) {
 ## API reference
 
 
-
-
+假设物体是以直线运动的。
+不考虑GPS点位漂移及信号中断问题。
 
 ## Custome your Data
 
