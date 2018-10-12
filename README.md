@@ -1,12 +1,37 @@
-# Leaflet-TrackPlayback
+# Leaflet.TrackPlayback
 
 ## Introduce
 
-基于leaflet+canvas+webpack实现的海上船舶轨迹回放插件，动画采用`requestAnimationFrame`，支持轨迹的播放、暂停、快进、快退操作以及上万个轨迹点的显示和上千条轨迹的回放。
+It's a track playback plugin based on leaflet.You need provide some GPS data and time data, then you can play the track on the map.Support track playback, pause, fast forward, fast reverse operation.
+
+## Requirements
+
+- leaflet version: >=0.7
+- bootstrap3.7.7 (if you need playbackControl)
+
+## Demo
+
+[Demo](https://linghuam.github.io/Leaflet.TrackPlayback/)
 
 ![效果图1](./static/images/1.png)
 
 ![效果图2](./static/images/2.png)
+
+
+## Usage
+
+``` bash
+# install dependencies
+npm install
+
+# 生成 dist/LeafletPlayback.js文件
+npm run dev
+
+# 生成 dist/LeafletPlayback.min.js文件
+npm run build
+
+```
+具体使用方法参照[index.html](index.html)页面
 
 
 ## Example
@@ -24,20 +49,11 @@ $.getJSON('src/assets/data/3.json', function (Data) {
 })
 ```
 
-## Usage
+## API reference
 
-``` bash
-# install dependencies
-npm install
 
-# 生成 dist/LeafletPlayback.js文件
-npm run dev
 
-# 生成 dist/LeafletPlayback.min.js文件
-npm run build
 
-```
-具体使用方法参照[index.html](index.html)页面
 
 ## Custome your Data
 
