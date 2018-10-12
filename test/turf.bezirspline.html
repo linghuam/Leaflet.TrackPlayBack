@@ -15,11 +15,21 @@
 <body>
   <div id="mapid" style="position:absolute;left:0;top:0;right:0;bottom:0;"></div>
   <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
+  <script src='./tracklayer.js'></script>
   <script>
     var map = L.map('mapid').setView([18.427501, -76.091308], 8);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
+    var trackLayer = new TrackLayer().addTo(map);
+    var container = trackLayer.getContainer();
+    var context = container.getContext('2d');
+    context.lineWidth = 2;
+    context.strokeStyle = "#f00";
+    // context.fillRect(500, 500, container.width, container.height);
+    // context.moveTo(0, 0);
+    // context.lineTo(500, 500);
+    // context.stroke();
     var popup = L.popup();
     map.on('click', function(e) {
         popup.setLatLng(e.latlng)
@@ -64,35 +74,56 @@
 
     var latlngs = L.GeoJSON.coordsToLatLngs(curved.geometry.coordinates);
 
-    L.geoJSON(curved, {
-        style: (fea) => {
-            return  {
-                color: '#f00'
-            }
-        }
-    }).addTo(map);
+    // L.geoJSON(curved, {
+    //     style: (fea) => {
+    //         return  {
+    //             color: '#f00'
+    //         }
+    //     }
+    // }).addTo(map);
 
     // L.polyline(latlngs, {color:'#0f0', smoothFactor: 0, noClip: true}).addTo(map);
 
     function getPoint(latlng) {
-      return map.latLngToContainerPoint(latlng);
+      return map.latLngToLayerPoint(latlng);
     }
 
-    var marker = L.marker(latlngs[0]).addTo(map);
-    var el = marker.getElement();
-    var fx = new L.PosAnimation();
+    // 动画1，dom动画
+    // var marker = L.marker(latlngs[0]).addTo(map);
+    // var el = marker.getElement();
+    // var fx = new L.PosAnimation();
     var len = latlngs.length;
-    var index = 1;
-    fx.on('end', () => {
-      index ++;
-      if (index >= len) {
-        fx.stop();
-        fx.off('end');
-      } else {
-        fx.run(el, getPoint(latlngs[index]), 0.05);
+    // var index = 1;
+    // fx.on('end', () => {
+    //   index ++;
+    //   if (index >= len) {
+    //     fx.stop();
+    //     fx.off('end');
+    //   } else {
+    //     fx.run(el, getPoint(latlngs[index]), 0.05);
+    //   }
+    // });
+    // fx.run(el, getPoint(latlngs[index]), 0.05);
+
+    // 动画2， canvas动画
+    function drawLine (from, to) {
+        context.beginPath();
+        context.moveTo(from.x, from.y);
+        context.lineTo(to.x, to.y);
+        context.stroke();
+    }
+    let curindex = 0;
+    function drawAnimate(){
+      curindex ++;
+      if (curindex < len) {
+        let from = getPoint(latlngs[curindex-1]);
+        let to = getPoint(latlngs[curindex]);
+        drawLine(from, to);
+        window.requestAnimationFrame(drawAnimate);
       }
-    });
-    fx.run(el, getPoint(latlngs[index]), 0.05);
+    }
+
+    drawAnimate();
 
   </script>
 </body>
