@@ -1,4 +1,4 @@
-# Leaflet.TrackPlayback
+# Leaflet.TrackPlayBack
 
 ## Introduce
 
