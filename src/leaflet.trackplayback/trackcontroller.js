@@ -1,30 +1,32 @@
-// import L from 'leaflet'
+import { isArray } from './util'
+import { Track } from './track'
 
-export var TrackController = L.Class.extend({
+export const TrackController = L.Class.extend({
 
-  initialize: function (tracks, draw, map, options) {
+  initialize: function (tracks = [], draw, options) {
     L.setOptions(this, options)
 
-    this._map = map;
-
-    this._tracks = []
-
-    this._minTime = null
-    this._maxTime = null
+    if (isArray(tracks)) {
+      this._tracks = tracks
+    } else if (tracks instanceof Track) {
+      this._tracks = [tracks]
+    } else {
+      throw new Error('track must be an instance of `Track` or an array of `Track` instance!')
+    }
 
     this._draw = draw
 
-    if (tracks && tracks.length) {
-      for (let i = 0, len = tracks.length; i < len; i++) {
-        this._tracks.push(tracks[i])
-      }
-    }
+    // this._map = map
+
+    this._minTime = null
+
+    this._maxTime = null
 
     this._update()
 
-    this._caculateCount()
+    // this._caculateCount()
 
-    this.locateToFirstTrack()
+    // this.locateToFirstTrack()
   },
 
   getMinTime: function () {
@@ -41,13 +43,18 @@ export var TrackController = L.Class.extend({
       var spoint = track0.getStartTrackPoint();
       if (spoint) {
         var latlng = L.latLng(spoint.lat, spoint.lng);
-        this._map.panTo(latlng);
+        // this._map.panTo(latlng);
       }
     }
   },
 
   addTrack: function (track) {
-    if (track) {
+    if (isArray(track)) {
+      for (let i = 0, len = track.length; i < len; i++) {
+        this.addTrack(track[i])
+      }
+    }
+    if (track instanceof Track) {
       this._tracks.push(track)
       this._update()
     }
@@ -63,7 +70,6 @@ export var TrackController = L.Class.extend({
   },
 
   _update: function () {
-    if (this._tracks.length) {
       this._minTime = this._tracks[0].getStartTrackPoint().time
       this._maxTime = this._tracks[0].getEndTrackPoint().time
       for (let i = 0, len = this._tracks.length; i < len; i++) {
@@ -76,7 +82,6 @@ export var TrackController = L.Class.extend({
           this._maxTime = etime
         }
       }
-    }
   },
 
   _caculateCount: function () {
@@ -91,6 +96,6 @@ export var TrackController = L.Class.extend({
 
 })
 
-export var trackController = function (tracks, draw, options) {
+export const trackController = function (tracks, draw, options) {
   return new TrackController(tracks, draw, options)
 }

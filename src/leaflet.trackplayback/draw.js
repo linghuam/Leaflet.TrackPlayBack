@@ -1,7 +1,6 @@
-// import L from 'leaflet'
 import {TrackLayer} from './tracklayer'
 
-export var Draw = L.Class.extend({
+export const Draw = L.Class.extend({
 
     trackPointOptions: {
       isDraw: false,
@@ -22,7 +21,7 @@ export var Draw = L.Class.extend({
       fillColor: '#000',
       opacity:0.3
     },
-    shipOptions: {
+    targetOptions: {
       useImg: false,
       imgUrl: '../../static/images/ship.png',
       width: 8,
@@ -37,10 +36,9 @@ export var Draw = L.Class.extend({
     },
 
   initialize: function (map, options) {
-    // L.setOptions(this, options) //无法执行深拷贝
     this.trackPointOptions = L.extend(this.trackPointOptions, options.trackPointOptions)
     this.trackLineOptions = L.extend(this.trackLineOptions, options.trackLineOptions)
-    this.shipOptions = L.extend(this.shipOptions, options.shipOptions)
+    this.targetOptions = L.extend(this.targetOptions, options.targetOptions)
     this.toolTipOptions = L.extend(this.toolTipOptions, options.toolTipOptions)
     this._map = map
     this._trackLayer = new TrackLayer().addTo(map)
@@ -55,6 +53,28 @@ export var Draw = L.Class.extend({
 
   update: function () {
     this._trackLayerUpdate()
+  },
+
+  drawTrack: function (trackpoints) {
+    this._bufferTracks.push(trackpoints)
+    this._drawTrack(trackpoints)
+  },
+
+  removeLayer: function () {
+    this._bufferTracks = []
+    this._trackLayer.off('update', this._trackLayerUpdate, this)
+    this._map.off('mousemove', this._onmousemoveEvt, this)
+    if (this._map.hasLayer(this._trackLayer)) {
+      this._map.removeLayer(this._trackLayer)
+    }
+    if (this._map.hasLayer(this._trackPointFeatureGroup)) {
+      this._map.removeLayer(this._trackPointFeatureGroup)
+    }
+  },
+
+  clear: function () {
+    this._clearLayer()
+    this._bufferTracks = []
   },
 
   _trackLayerUpdate: function () {
@@ -97,7 +117,7 @@ export var Draw = L.Class.extend({
     var tooltip = this._tooltip = L.tooltip(this.toolTipOptions)
     tooltip.setLatLng(latlng)
     tooltip.addTo(this._map)
-    tooltip.setContent(this.getTooltipText(trackpoint))
+    tooltip.setContent(this._getTooltipText(trackpoint))
   },
 
   _drawTrack: function (trackpoints) {
@@ -106,31 +126,26 @@ export var Draw = L.Class.extend({
       this._drawTrackLine(trackpoints)
     }
     // 画船
-    if (this.shipOptions.useImg) {
-      this._drawShip2(trackpoints[trackpoints.length - 1])
+    if (this.targetOptions.useImg) {
+      this._drawShipImage(trackpoints[trackpoints.length - 1])
     } else {
-      this._drawShip(trackpoints[trackpoints.length - 1])
+      this._drawShipCanvas(trackpoints[trackpoints.length - 1])
     }
     // 画经过的轨迹点
     if (this.trackPointOptions.isDraw) {
       if (this.trackPointOptions.useCanvas) {
-        this._drawTrackPoints(trackpoints)
+        this._drawTrackPointsCanvas(trackpoints)
       } else {
-        this._drawTrackPoints2(trackpoints)
+        this._drawTrackPointsSvg(trackpoints)
       }
     }
-  },
-
-  drawTrack: function (trackpoints) {
-    this._bufferTracks.push(trackpoints)
-    this._drawTrack(trackpoints)
   },
 
   _drawTrackLine: function (trackpoints) {
     var options = this.trackLineOptions
     var tp0 = this._map.latLngToLayerPoint(L.latLng(trackpoints[0].lat, trackpoints[0].lng))
     this._ctx.save()
-    this._ctx.beginPath()    
+    this._ctx.beginPath()
     // 画轨迹线
     this._ctx.moveTo(tp0.x, tp0.y)
     for (let i = 1, len = trackpoints.length; i < len; i++) {
@@ -150,7 +165,7 @@ export var Draw = L.Class.extend({
     this._ctx.restore()
   },
 
-  _drawTrackPoints: function (trackpoints) {
+  _drawTrackPointsCanvas: function (trackpoints) {
     var options = this.trackPointOptions
     this._ctx.save()
     for (let i = 0, len = trackpoints.length; i < len; i++) {
@@ -174,27 +189,27 @@ export var Draw = L.Class.extend({
     this._ctx.restore()
   },
 
-  _drawTrackPoints2: function (trackpoints) {
+  _drawTrackPointsSvg: function (trackpoints) {
     for (let i = 0, len = trackpoints.length; i < len; i++) {
       if (trackpoints[i].isOrigin) {
         let latLng = L.latLng(trackpoints[i].lat, trackpoints[i].lng)
         let cricleMarker = L.circleMarker(latLng, this.trackPointOptions)
-        cricleMarker.bindTooltip(this.getTooltipText(trackpoints[i]), this.toolTipOptions)
+        cricleMarker.bindTooltip(this._getTooltipText(trackpoints[i]), this.toolTipOptions)
         this._trackPointFeatureGroup.addLayer(cricleMarker)
       }
     }
   },
 
-  _drawShip: function (trackpoint) {
+  _drawShipCanvas: function (trackpoint) {
     var point = this._map.latLngToLayerPoint(L.latLng(trackpoint.lat, trackpoint.lng))
     var rotate = trackpoint.dir || 0
-    var w = this.shipOptions.width
-    var h = this.shipOptions.height
+    var w = this.targetOptions.width
+    var h = this.targetOptions.height
     var dh = h / 3
 
     this._ctx.save()
-    this._ctx.fillStyle = this.shipOptions.fillColor
-    this._ctx.strokeStyle = this.shipOptions.color
+    this._ctx.fillStyle = this.targetOptions.fillColor
+    this._ctx.strokeStyle = this.targetOptions.color
     this._ctx.translate(point.x, point.y)
     this._ctx.rotate((Math.PI / 180) * rotate)
     this._ctx.beginPath()
@@ -209,11 +224,11 @@ export var Draw = L.Class.extend({
     this._ctx.restore()
   },
 
-  _drawShip2: function (trackpoint) {
+  _drawShipImage: function (trackpoint) {
     var point = this._map.latLngToLayerPoint(L.latLng(trackpoint.lat, trackpoint.lng))
     var dir = trackpoint.dir || 0
-    var width = this.shipOptions.width
-    var height = this.shipOptions.height
+    var width = this.targetOptions.width
+    var height = this.targetOptions.height
     var offset = {
       x: width / 2,
       y: height / 2
@@ -226,10 +241,10 @@ export var Draw = L.Class.extend({
       this._ctx.drawImage(img, 0 - offset.x, 0 - offset.y, width, height)
       this._ctx.restore()
     }.bind(this)
-    img.src = this.shipOptions.imgUrl
+    img.src = this.targetOptions.imgUrl
   },
 
-  getTooltipText: function (targetobj) {
+  _getTooltipText: function (targetobj) {
     var content = [];
     content.push('<table>');
     if (targetobj.info && targetobj.info.length) {
@@ -245,18 +260,6 @@ export var Draw = L.Class.extend({
     return content;
   },
 
-  removeLayer: function () {
-    this._bufferTracks = []
-    this._trackLayer.off('update', this._trackLayerUpdate, this)
-    this._map.off('mousemove', this._onmousemoveEvt, this)
-    if (this._map.hasLayer(this._trackLayer)) {
-      this._map.removeLayer(this._trackLayer)
-    }
-    if (this._map.hasLayer(this._trackPointFeatureGroup)) {
-      this._map.removeLayer(this._trackPointFeatureGroup)
-    }
-  },
-
   _clearLayer: function () {
     var bounds = this._trackLayer.getBounds()
     if (bounds) {
@@ -268,14 +271,9 @@ export var Draw = L.Class.extend({
     if (this._map.hasLayer(this._trackPointFeatureGroup)) {
       this._trackPointFeatureGroup.clearLayers()
     }
-  },
-
-  clear: function () {
-    this._clearLayer()
-    this._bufferTracks = []
   }
 })
 
-export var draw = function (map, options) {
+export const draw = function (map, options) {
   return new Draw(map, options)
 }

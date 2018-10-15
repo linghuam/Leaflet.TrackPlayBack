@@ -1,18 +1,20 @@
-export const Clock = L.Class.extend({
+
+export const Clock = L.Evented.extend({
 
   options: {
     speed: 13,
     maxSpeed: 65
   },
 
-  initialize: function (trackController, callback, options) {
+  initialize: function (trackController, options) {
     L.setOptions(this, options)
+
     this._trackController = trackController
     this._endTime = this._trackController.getMaxTime()
     this._curTime = this._trackController.getMinTime()
     this._speed = this.options.speed
     this._maxSpeed = this.options.maxSpeed
-    this._callback = callback || function () {}
+    // this._callback = callback
     this._lastFpsUpdateTime = 0
   },
 
@@ -24,27 +26,12 @@ export const Clock = L.Class.extend({
 
   // 计算两帧时间间隔，单位：秒
   caculatefpsTime: function (now) {
-    var time = (now - this._lastFpsUpdateTime) / 1000
+    let time = (now - this._lastFpsUpdateTime) / 1000
     if (this._lastFpsUpdateTime === 0) {
       time = 0
     }
     this._lastFpsUpdateTime = now
     return time
-  },
-
-  _tick: function () {
-    var now = +new Date()
-    var fpstime = this.caculatefpsTime(now)
-    var isPause = false
-    var stepTime = fpstime * Math.pow(2, this._speed - 1)
-    this._curTime += stepTime
-    if (this._curTime >= this._endTime) {
-      this._curTime = this._endTime
-      isPause = true
-    }
-    this._trackController.drawTracksByTime(this._curTime)
-    this._callback(this._curTime)
-    if (!isPause) this._intervalID = window.requestAnimationFrame(this._tick.bind(this))
   },
 
   start: function () {
@@ -98,13 +85,13 @@ export const Clock = L.Class.extend({
   },
 
   isPlaying: function () {
-    return this._intervalID ? 1 : 0
+    return this._intervalID ? true : false
   },
 
   setCursor: function (time) {
     this._curTime = time
     this._trackController.drawTracksByTime(this._curTime)
-    this._callback(this._curTime)
+    // this._callback(this._curTime)
   },
 
   setSpeed: function (speed) {
@@ -113,9 +100,24 @@ export const Clock = L.Class.extend({
       this.stop()
       this.start()
     }
+  },
+
+  _tick: function () {
+    let now = +new Date()
+    let fpstime = this.caculatefpsTime(now)
+    let isPause = false
+    let stepTime = fpstime * Math.pow(2, this._speed - 1)
+    this._curTime += stepTime
+    if (this._curTime >= this._endTime) {
+      this._curTime = this._endTime
+      isPause = true
+    }
+    this._trackController.drawTracksByTime(this._curTime)
+    // this._callback(this._curTime)
+    if (!isPause) this._intervalID = window.requestAnimationFrame(this._tick.bind(this))
   }
 })
 
-export var clock = function (trackController, callback, options) {
-  return new Clock(trackController, callback, options)
+export const clock = function (trackController, options) {
+  return new Clock(trackController, options)
 }

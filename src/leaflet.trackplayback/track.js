@@ -1,14 +1,4 @@
-import {
-  isArray
-} from './track'
-
-/**
- * single track data
- * [{lat: 30, lng: 116, time: 1502529980, heading: 300, info:[]},{},....]
- *
- * mutiple track data
- * [single track data, single track data, single track data]
- */
+import { isArray } from './util'
 
 export const Track = L.Class.extend({
 
@@ -156,6 +146,6 @@ export const Track = L.Class.extend({
   }
 })
 
-export var track = function (dataObj, options) {
-  return new Track(dataObj, options)
+export const track = function(trackData, options) {
+  return new Track(trackData, options)
 }
