@@ -1,5 +1,12 @@
 .leaflet-control-playback{position:relative;background-color:#7cbdf5;padding:10px;}
-.leaflet-control-playback .operateContainer{position:relative;}
+.leaflet-control-playback .optionsContainer{position:relative;}
+.leaflet-control-playback .buttonContainer {}
+.leaflet-control-playback .infoContainer {}
+.leaflet-control-playback .sliderContainer {}
+
+
+
+
 .leaflet-control-playback .scrollContainer{position:relative;text-align:center;}
 
 .leaflet-control-playback .operateContainer span{font-size:22px;cursor:pointer;margin:0 6px;}

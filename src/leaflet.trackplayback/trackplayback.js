@@ -11,7 +11,7 @@ import * as Util from './util'
  * mutiple track data
  * [single track data, single track data, single track data]
  */
-export const TrackPlayBack = L.Class.extend({
+export const TrackPlayBack = L.Evented.extend({
     initialize: function (data, map, options = {}) {
         let drawOptions = {
             trackPointOptions: options.trackPointOptions,
@@ -19,58 +19,78 @@ export const TrackPlayBack = L.Class.extend({
             targetOptions: options.targetOptions,
             toolTipOptions: options.toolTipOptions
         }
-        this._tracks = this._initTracks(data)
-        this._draw = new Draw(map, drawOptions)
-        this._trackController = new TrackController(this._tracks, this._draw)
-        this._clock = new Clock(this._trackController, options.clockOptions)
+        this.tracks = this._initTracks(data)
+        this.draw = new Draw(map, drawOptions)
+        this.trackController = new TrackController(this.tracks, this.draw)
+        this.clock = new Clock(this.trackController, options.clockOptions)
 
-        this._clock.setCursor(this._clock.getStartTime())
+        this.clock.on('tick', e => {
+            this.fire('tick', e)
+        })
+
+        this.clock.setCursor(this.clock.getStartTime())
 
     },
     addTrack: function () {
 
     },
     start: function () {
-        this._clock.start()
+        this.clock.start()
         return this
     },
     stop: function () {
-        this._clock.stop()
+        this.clock.stop()
         return this
     },
     rePlaying: function () {
-        this._clock.rePlaying()
+        this.clock.rePlaying()
         return this
     },
     slowSpeed: function () {
-        this._clock.slowSpeed()
+        this.clock.slowSpeed()
         return this
     },
     quickSpeed: function () {
-        this._clock.quickSpeed()
+        this.clock.quickSpeed()
         return this
     },
     getSpeed: function () {
-        return this._clock.getSpeed()
+        return this.clock.getSpeed()
     },
     getCurTime: function () {
-        return this._clock.getCurTime()
+        return this.clock.getCurTime()
     },
     getStartTime: function () {
-        return this._clock.getStartTime()
+        return this.clock.getStartTime()
     },
     getEndTime: function () {
-        return this._clock.getEndTime()
+        return this.clock.getEndTime()
     },
     isPlaying: function () {
-        return this._clock.isPlaying()
+        return this.clock.isPlaying()
     },
     setCursor: function (time) {
-        this._clock.setCursor(time)
+        this.clock.setCursor(time)
         return this
     },
     setSpeed: function (speed) {
-        this._clock.setSpeed(speed)
+        this.clock.setSpeed(speed)
+        return this
+    },
+    showTrackPoint: function () {
+        this.draw.showTrackPoint()
+        return this
+    },
+    hideTrackPoint: function () {
+        this.draw.hideTrackPoint()
+        return this
+    },
+    showTrackLine: function () {
+        this.draw.showTrackLine()
+        return this
+    },
+    hideTrackLine: function () {
+        this.draw.hideTrackLine()
         return this
     },
     _initTracks: function(data) {

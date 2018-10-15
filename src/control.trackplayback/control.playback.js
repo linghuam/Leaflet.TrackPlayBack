@@ -1,151 +1,192 @@
-L.Control.TrackPlayBack = L.Control.extend({
+export const TrackPlayBackControl = L.Control.extend({
 
   options: {
     position: 'topright',
-    data: {}
+    showOptions: true,
+    showInfo: true,
+    showSlider: true,
+    autoPlay: false
   },
 
-  bootstrapIconClass: {
-    play: 'glyphicon-play',
-    stop: 'glyphicon-pause',
-    restart: 'glyphicon-repeat',
-    slow: 'glyphicon-backward',
-    quick: 'glyphicon-forward',
-    close: 'glyphicon-remove'
-  },
-
-  initialize: function (options) {
+  initialize: function (trackplayback, options) {
     L.Control.prototype.initialize.call(this, options)
-    this._data = this.options.data
-    this._playback = {}
+    this.trackPlayBack = trackplayback
+    this.trackPlayBack.on('tick', this._tickCallback)
   },
 
   onAdd: function (map) {
-    this._initLayout()
-    this._update()
-    this._initEvts()
+    this._initContainer()
     return this._container
   },
 
   onRemove: function (map) {
-    this._playback.draw.removeLayer()
+
   },
 
-  getControlHtml: function () {
-    var html = []
-    html.push('<div class="optionsDiv">')
-    html.push('<label><input type="checkbox" class="isshowpoint">显示轨迹点</label>')
-    html.push('<label><input type="checkbox" class="isshowline">显示轨迹线</label>')
-    html.push('</div>')
-    html.push('<div class="operateContainer">')
-    html.push('<span class="btn-play glyphicon glyphicon-play" title="播放"></span>')
-    html.push('<span class="btn-restart glyphicon glyphicon-repeat" title="重播"></span>')
-    html.push('<span class="btn-slow glyphicon glyphicon-backward" title="减速"></span>')
-    html.push('<span class="btn-quick glyphicon glyphicon-forward" title="加速"></span>')
-    html.push('<span class="speed"></span>')
-    html.push('<span class="btn-close glyphicon glyphicon-remove" title="关闭"></span>')
-    html.push('</div>')
-    html.push('<div class="scrollContainer">')
-    html.push('<span class="stime"></span>')
-    html.push('<span class="etime"></span>')
-    html.push('<input type="range" class="range"/>')
-    html.push('<span class="curtime"></span>')
-    html.push('</div>')
-    return html.join('')
+  /**
+   * 根据unix时间戳(单位:秒)获取时间字符串
+   * @param  {[int]} time     [时间戳（精确到秒）]
+   * @param  {[string]} accuracy [精度，日：d, 小时：h,分钟：m,秒：s]
+   * @return {[string]}          [yy:mm:dd hh:mm:ss]
+   */
+  getTimeStrFromUnix: function (time, accuracy = 's') {
+    time = parseInt(time * 1000)
+    let newDate = new Date(time)
+    let year = newDate.getFullYear()
+    let month = (newDate.getMonth() + 1) < 10 ? '0' + (newDate.getMonth() + 1) : newDate.getMonth() + 1
+    let day = newDate.getDate() < 10 ? '0' + newDate.getDate() : newDate.getDate()
+    let hours = newDate.getHours() < 10 ? '0' + newDate.getHours() : newDate.getHours()
+    let minuts = newDate.getMinutes() < 10 ? '0' + newDate.getMinutes() : newDate.getMinutes()
+    let seconds = newDate.getSeconds() < 10 ? '0' + newDate.getSeconds() : newDate.getSeconds()
+    let ret
+    if (accuracy === 'd') {
+      ret = year + '-' + month + '-' + day
+    } else if (accuracy === 'h') {
+      ret = year + '-' + month + '-' + day + ' ' + hours
+    } else if (accuracy === 'm') {
+      ret = year + '-' + month + '-' + day + ' ' + hours + ':' + minuts
+    } else {
+      ret = year + '-' + month + '-' + day + ' ' + hours + ':' + minuts + ':' + seconds
+    }
+    return ret
   },
 
-  _initLayout: function () {
+
+  _initContainer: function () {
     var className = 'leaflet-control-playback'
     this._container = L.DomUtil.create('div', className)
+    L.DomEvent.stopPropagation(this._container)
 
-    if (L.DomEvent) {
-      L.DomEvent.disableClickPropagation(this._container)
-    }
+    this._optionsContainer = this._createContainer('optionsContainer', this._container)
+    this._buttonContainer = this._createContainer('buttonContainer', this._container)
+    this._infoContainer = this._createContainer('infoContainer', this._container)
+    this._sliderContainer = this._createContainer('sliderContainer', this._container)
 
-    var $container = $(this._container)
-    $container.html(this.getControlHtml())
+    this._pointCbx = this._createCheckbox('显示轨迹点', 'show-trackpoint', this._optionsContainer, this._showTrackPoint)
+    this._lineCbx = this._createCheckbox('显示轨迹线', 'show-trackLine', this._optionsContainer, this._showTrackLine)
 
-    this._operateObjs = {
-      isshowpoint: $container.find('.isshowpoint'),
-      isshowline: $container.find('.isshowline'),
-      play: $container.find('.btn-play'),
-      restart: $container.find('.btn-restart'),
-      slow: $container.find('.btn-slow'),
-      quick: $container.find('.btn-quick'),
-      speed: $container.find('.speed'),
-      close: $container.find('.btn-close'),
-      startTime: $container.find('.stime'),
-      endTime: $container.find('.etime'),
-      range: $container.find('.range'),
-      curTime: $container.find('.curtime')
-    }
+    this._playBtn = this._createButton('播放', 'btn-stop', this._buttonContainer, this._play)
+    this._restartBtn = this._createButton('重播', 'btn-restart', this._buttonContainer, this._restart)
+    this._slowSpeedBtn = this._createButton('减速', 'btn-slow', this._buttonContainer, this._slow)
+    this._quickSpeedBtn = this._createButton('加速', 'btn-quick', this._buttonContainer, this._quick)
+    this._closeBtn = this._createButton('关闭', 'btn-close', this._buttonContainer, this._close)
+
+    this._infoStartTime = this._createInfo(this.trackPlayBack.getStartTime(), 'info-start-time', this._infoContainer)
+    this._infoEndTime = this._createInfo(this.trackPlayBack.getEndTime(), 'info-end-time', this._infoContainer)
+    this._infoCurTime = this._createInfo(this.trackPlayBack.getCurTime(), 'info-cur-time', this._infoContainer)
+    this._infoSpeedRatio = this._createInfo(`X${this.trackPlayBack.getSpeed()}`, 'info-speed-ratio', this._infoContainer)
+
+    this._slider = this._createSlider('time-slider', this._sliderContainer, this._scrollchange)
+
+    return this._container
   },
 
-  _initEvts: function () {
-    L.DomEvent.on(this._operateObjs.isshowpoint.get(0), 'change', this._isshowpoint, this)
-    L.DomEvent.on(this._operateObjs.isshowline.get(0), 'change', this._isshowline, this)
-    L.DomEvent.on(this._operateObjs.play.get(0), 'click', this._play, this)
-    L.DomEvent.on(this._operateObjs.restart.get(0), 'click', this._restart, this)
-    L.DomEvent.on(this._operateObjs.slow.get(0), 'click', this._slow, this)
-    L.DomEvent.on(this._operateObjs.quick.get(0), 'click', this._quick, this)
-    L.DomEvent.on(this._operateObjs.close.get(0), 'click', this._close, this)
-    L.DomEvent.on(this._operateObjs.range.get(0), 'click mousedown dbclick', L.DomEvent.stopPropagation)
-      .on(this._operateObjs.range.get(0), 'click', L.DomEvent.preventDefault)
-      .on(this._operateObjs.range.get(0), 'change', this._scrollchange, this)
-      .on(this._operateObjs.range.get(0), 'mousemove', this._scrollchange, this)
+  _createContainer: function (className, container) {
+    return L.DomUtil.create('div', className, container)
   },
 
-  _isshowpoint: function (e) {
+  _createCheckbox: function (labelName, className, container, fn) {
+    let divEle = L.DomUtil.create('div', className + ' trackplayback-checkbox', container)
+
+    let inputEle = L.DomUtil.create('input', 'trackplayback-input', divEle)
+    let inputId = `trackplayback-input-${L.Util.stamp(inputEle)}`
+    inputEle.setAttribute('type', 'checkbox')
+    inputEle.setAttribute('id', inputId)
+
+    let labelEle = L.DomUtil.create('label', 'trackplayback-label', divEle)
+    labelEle.setAttribute('for', inputId)
+    labelEle.innerHTML = labelName
+
+    L.DomEvent.stopPropagation(inputEle)
+    L.DomEvent.on(inputEle, 'change', fn, this)
+
+    return divEle
+  },
+
+  _createButton: function (title, className, container, fn) {
+    let link = L.DomUtil.create('a', className, container)
+    link.href = '#'
+    link.title = title
+
+    /*
+     * Will force screen readers like VoiceOver to read this as "Zoom in - button"
+     */
+    link.setAttribute('role', 'button')
+    link.setAttribute('aria-label', title)
+
+    L.DomEvent.disableClickPropagation(link)
+    L.DomEvent.on(link, 'click', fn, this)
+
+    return link
+  },
+
+  _createInfo: function (info, className, container) {
+    let infoEle = L.DomUtil.create('span', className, container)
+    infoEle.innerHTML = info
+    return infoEle
+  },
+
+  _createSlider: function (className, container, fn) {
+    let sliderEle = L.DomUtil.create('input', className, container)
+    sliderEle.setAttribute('type', 'range')
+
+    L.DomEvent.on(sliderEle, 'click mousedown dbclick', L.DomEvent.stopPropagation)
+      .on(sliderEle, 'click', L.DomEvent.preventDefault)
+      .on(sliderEle, 'change', fn, this)
+      .on(sliderEle, 'mousemove', fn, this)
+
+    return sliderEle
+  },
+
+  _showTrackPoint(e) {
     if (e.target.checked) {
-      this._playback.draw.trackPointOptions.isDraw = true
+      this.trackPlayBack.showTrackPoint()
     } else {
-      this._playback.draw.trackPointOptions.isDraw = false
+      this.trackPlayBack.hideTrackPoint()
     }
-    this._playback.draw.update()
   },
 
-  _isshowline: function (e) {
+  _showTrackLine(e) {
     if (e.target.checked) {
-      this._playback.draw.trackLineOptions.isDraw = true
+      this.trackPlayBack.showTrackLine()
     } else {
-      this._playback.draw.trackLineOptions.isDraw = false
+      this.trackPlayBack.hideTrackLine()
     }
-    this._playback.draw.update()
   },
 
   _play: function () {
-    var $this = this._operateObjs.play
-    if ($this.hasClass(this.bootstrapIconClass.play)) {
-      $this.removeClass(this.bootstrapIconClass.play)
-      $this.addClass(this.bootstrapIconClass.stop)
-      $this.attr('title', '停止')
-      this._playback.clock.start()
+    let hasClass = L.DomUtil.hasClass(this._playBtn, 'btn-stop')
+    if (hasClass) {
+      L.DomUtil.removeClass(this._playBtn, 'btn-stop')
+      L.DomUtil.addClass(this._playBtn, 'btn-start')
+      this._playBtn.setAttribute('title', '停止')
+      this.trackPlayBack.start()
     } else {
-      $this.removeClass(this.bootstrapIconClass.stop)
-      $this.addClass(this.bootstrapIconClass.play)
-      $this.attr('title', '播放')
-      this._playback.clock.stop()
+      L.DomUtil.removeClass(this._playBtn, 'btn-start')
+      L.DomUtil.addClass(this._playBtn, 'btn-stop')
+      this._playBtn.setAttribute('title', '播放')
+      this.trackPlayBack.stop()
     }
   },
 
   _restart: function () {
-    var $play = this._operateObjs.play  // 播放开始改变播放按钮样式
-    $play.removeClass(this.bootstrapIconClass.play)
-    $play.addClass(this.bootstrapIconClass.stop)
-    $play.attr('title', '停止')
-    this._playback.clock.rePlaying()
+    // 播放开始改变播放按钮样式
+    L.DomUtil.removeClass(this._playBtn, 'btn-stop')
+    L.DomUtil.addClass(this._playBtn, 'btn-start')
+    this._playBtn.setAttribute('title', '停止')
+    this.trackPlayBack.rePlaying()
   },
 
   _slow: function () {
-    this._playback.clock.slowSpeed()
-    var sp = this._playback.clock.getSpeed()
-    this._operateObjs.speed.html('X' + sp)
+    this.trackPlayBack.slowSpeed()
+    let sp = this.trackPlayBack.getSpeed()
+    this._infoSpeedRatio.innerHTML = `X${sp}`
   },
 
   _quick: function () {
-    this._playback.clock.quickSpeed()
-    var sp = this._playback.clock.getSpeed()
-    this._operateObjs.speed.html('X' + sp)
+    this.trackPlayBack.quickSpeed()
+    let sp = this.trackPlayBack.getSpeed()
+    this._infoSpeedRatio.innerHTML = `X${sp}`
   },
 
   _close: function () {
@@ -157,104 +198,26 @@ L.Control.TrackPlayBack = L.Control.extend({
   },
 
   _scrollchange: function (e) {
-    var val = Number(e.target.value)
-    this._playback.clock.setCursor(val)
+    let val = Number(e.target.value)
+    this.trackPlayBack.setCursor(val)
   },
 
-  _update: function () {
-    var map = this._map
-    var data = this._dataTransform(this._data.msg.shipList)
-    if (map && data) {
-      var tracks = []
-      for (var i = 0, len = data.length; i < len; i++) {
-        var track = new L.PlayBack.Track(data[i], this.options)
-        tracks.push(track)
-      }
-      this._playback.draw = new L.PlayBack.Draw(map, this.options)
-      this._playback.trackController = new L.PlayBack.TrackController(tracks, this._playback.draw, map, this.options)
-      this._playback.clock = new L.PlayBack.Clock(this._playback.trackController, this._clockCallback.bind(this), this.options)
-
-      this._operateObjs.speed.html('X' + this._playback.clock.getSpeed())
-      this.setTime()
-      this._playback.clock.setCursor(this.getStartTime())
-    }
-  },
-
-  setTime: function () {
-    var startTime = L.PlayBack.Util.getTimeStrFromUnix(this.getStartTime())
-    var endTime = L.PlayBack.Util.getTimeStrFromUnix(this.getEndTime())
-    var curTime = L.PlayBack.Util.getTimeStrFromUnix(this.getCurTime())
-    this._operateObjs.startTime.html(startTime)
-    this._operateObjs.endTime.html(endTime)
-    this._operateObjs.curTime.html(curTime)
-    this._operateObjs.range.attr('min', this.getStartTime())
-    this._operateObjs.range.attr('max', this.getEndTime())
-    this._operateObjs.range.val(this.getCurTime())
-  },
-
-  getStartTime: function () {
-    return this._playback.clock.getStartTime()
-  },
-
-  getEndTime: function () {
-    return this._playback.clock.getEndTime()
-  },
-
-  getCurTime: function () {
-    return this._playback.clock.getCurTime()
-  },
-
-  _clockCallback: function (s) {
+  _tickCallback: function (e) {
     // 更新时间
-    var time = L.PlayBack.Util.getTimeStrFromUnix(s)
-    this._operateObjs.curTime.html(time)
+    let time = this.getTimeStrFromUnix(e.time)
+    this._infoCurTime.innerHTML = time
     // 更新时间轴
-    this._operateObjs.range.val(s)
+    this._slider.value = e.time
     // 播放结束后改变播放按钮样式
-    if (s >= this.getEndTime()) {
-      var $play = this._operateObjs.play
-      $play.removeClass(this.bootstrapIconClass.stop)
-      $play.addClass(this.bootstrapIconClass.play)
-      $play.attr('title', '播放')
-      this._playback.clock.stop()
+    if (e.time >= this.trackPlayBack.getEndTime()) {
+      L.DomUtil.removeClass(this._playBtn, 'btn-start')
+      L.DomUtil.addClass(this._playBtn, 'btn-stop')
+      this._playBtn.setAttribute('title', '播放')
+      this.trackPlayBack.stop()
     }
-  },
-
-  _dataTransform: function (data) {
-    if (!data || !data.length) {
-      console.log('playback_error:data transform error!')
-      return
-    }
-    var datas = []
-    for (var i = 0, len = data.length; i < len; i++) {
-      var ph = data[i].num
-      var dataobj = {}
-      dataobj.timePosList = []
-      for (var j = 0, lenj = data[i].posList.length; j < lenj; j++) {
-        var obj = {}
-        var pj = data[i].posList[j]
-        obj.lng = pj.lo / 600000 // 经度 【必须参数】
-        obj.lat = pj.la / 600000 // 纬度 【必须参数】
-        obj.time = pj.ti // 以秒为单位的unix时间戳 【必须参数】
-        obj.dir = parseFloat(pj.co / 10) // 航向 0-360度
-        obj.heading = parseFloat(pj.he) // 航艏向 0-360度
-        obj.info = [ // 轨迹点信息
-          {key: '批号', value: ph},
-          {key: '经度', value: L.PlayBack.Util.latlngTodfmStr(obj.lat, 'lng')},
-          {key: '纬度', value: L.PlayBack.Util.latlngTodfmStr(obj.lat, 'lat')},
-          {key: '时间', value: L.PlayBack.Util.getTimeStrFromUnix(pj.ti)},
-          {key: '航向', value: (pj.co / 10).toFixed(1) + '°'},
-          {key: '航艏向', value: parseFloat(pj.he).toFixed(1) + '°'},
-          {key: '航速', value: parseFloat(pj.sp / 10).toFixed(1) + '节'}
-        ]
-        dataobj.timePosList.push(obj)
-      }
-      datas.push(dataobj)
-    }
-    return datas
   }
 })
 
-L.control.playback = function (options) {
-  return new L.Control.PlayBack(options)
+export const trackplaybackcontrol = function (trackplayback, options) {
+  return new L.Control.PlayBack(trackplayback, options)
 }

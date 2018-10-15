@@ -40,6 +40,10 @@ export const Draw = L.Class.extend({
     this.trackLineOptions = L.extend(this.trackLineOptions, options.trackLineOptions)
     this.targetOptions = L.extend(this.targetOptions, options.targetOptions)
     this.toolTipOptions = L.extend(this.toolTipOptions, options.toolTipOptions)
+
+    this._showTrackPoint = this.trackLineOptions.isDraw
+    this._showTrackLine = this.trackLineOptions.isDraw
+
     this._map = map
     this._trackLayer = new TrackLayer().addTo(map)
     this._canvas = this._trackLayer.getContainer()
@@ -58,6 +62,26 @@ export const Draw = L.Class.extend({
   drawTrack: function (trackpoints) {
     this._bufferTracks.push(trackpoints)
     this._drawTrack(trackpoints)
+  },
+
+  showTrackPoint: function () {
+    this._showTrackPoint = true
+    this.update()
+  },
+
+  hideTrackPoint: function () {
+    this._showTrackPoint = false
+    this.update()
+  },
+
+  showTrackLine: function () {
+    this._showTrackLine = true
+    this.update()
+  },
+
+  hideTrackLine: function () {
+    this._showTrackLine = false
+    this.update()
   },
 
   removeLayer: function () {
@@ -87,7 +111,7 @@ export const Draw = L.Class.extend({
   },
 
   _onmousemoveEvt: function (e) {
-    if (!this.trackPointOptions.isDraw) {
+    if (!this._showTrackPoint) {
       return
     }
     var point = e.layerPoint
@@ -122,7 +146,7 @@ export const Draw = L.Class.extend({
 
   _drawTrack: function (trackpoints) {
     // 画轨迹线
-    if (this.trackLineOptions.isDraw) {
+    if (this._showTrackLine) {
       this._drawTrackLine(trackpoints)
     }
     // 画船
@@ -132,7 +156,7 @@ export const Draw = L.Class.extend({
       this._drawShipCanvas(trackpoints[trackpoints.length - 1])
     }
     // 画经过的轨迹点
-    if (this.trackPointOptions.isDraw) {
+    if (this._showTrackPoint) {
       if (this.trackPointOptions.useCanvas) {
         this._drawTrackPointsCanvas(trackpoints)
       } else {
@@ -152,7 +176,7 @@ export const Draw = L.Class.extend({
       let tpi = this._map.latLngToLayerPoint(L.latLng(trackpoints[i].lat, trackpoints[i].lng))
       this._ctx.lineTo(tpi.x, tpi.y)
     }
-    this._ctx.globalAlpha = options.opacity;
+    this._ctx.globalAlpha = options.opacity
     if (options.stroke) {
       this._ctx.strokeStyle = options.color
       this._ctx.lineWidth = options.weight

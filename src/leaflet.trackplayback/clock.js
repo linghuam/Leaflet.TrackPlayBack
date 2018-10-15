@@ -14,7 +14,6 @@ export const Clock = L.Evented.extend({
     this._curTime = this._trackController.getMinTime()
     this._speed = this.options.speed
     this._maxSpeed = this.options.maxSpeed
-    // this._callback = callback
     this._lastFpsUpdateTime = 0
   },
 
@@ -91,7 +90,7 @@ export const Clock = L.Evented.extend({
   setCursor: function (time) {
     this._curTime = time
     this._trackController.drawTracksByTime(this._curTime)
-    // this._callback(this._curTime)
+    this.fire('tick', {time: this._curTime})
   },
 
   setSpeed: function (speed) {
@@ -113,7 +112,7 @@ export const Clock = L.Evented.extend({
       isPause = true
     }
     this._trackController.drawTracksByTime(this._curTime)
-    // this._callback(this._curTime)
+    this.fire('tick', {time: this._curTime})
     if (!isPause) this._intervalID = window.requestAnimationFrame(this._tick.bind(this))
   }
 })
