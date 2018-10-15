@@ -1,4 +1,4 @@
-L.Control.PlayBack = L.Control.extend({
+L.Control.TrackPlayBack = L.Control.extend({
 
   options: {
     position: 'topright',

@@ -88,6 +88,7 @@ to transform data to standard format like this.
 * [html5 canvas教程](http://www.w3cplus.com/blog/tags/616.html?page=1)
 * [曲线轨迹动画原理](http://www.tuicool.com/articles/zaeQf22)
 * [WebGIS中使用ZRender实现轨迹前端动态播放特效](http://www.cnblogs.com/naaoveGIS/p/6718822.html)
+* [LeafletPlayback](https://github.com/hallahan/LeafletPlayback)
 
 
 ## License
