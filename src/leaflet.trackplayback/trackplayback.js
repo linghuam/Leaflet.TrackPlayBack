@@ -11,7 +11,7 @@ import * as Util from './util'
  * mutiple track data
  * [single track data, single track data, single track data]
  */
-export const TrackPlayback = L.Class.extend({
+export const TrackPlayBack = L.Class.extend({
     initialize: function (data, map, options = {}) {
         let drawOptions = {
             trackPointOptions: options.trackPointOptions,
@@ -91,5 +91,5 @@ export const TrackPlayback = L.Class.extend({
 })
 
 export const trackplayback = function (data, map, options) {
-    return new TrackPlayback(data, map, options)
+    return new TrackPlayBack(data, map, options)
 }
