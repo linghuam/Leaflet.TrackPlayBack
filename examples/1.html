@@ -6,9 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Document</title>
-  <link rel="stylesheet" href="../lib/leaflet/leaflet.css">
+  <link rel="stylesheet" href="./lib/leaflet/leaflet.css">
   <link rel="stylesheet" href="../dist/control.playback.css">
-  <script src="../lib/leaflet/leaflet.js"></script>
+  <script src="./lib/leaflet/leaflet.js"></script>
   <script src="../dist/control.trackplayback.js"></script>
   <script src="../dist/leaflet.trackplayback.js"></script>
 </head>
@@ -18,6 +18,8 @@
     map
   </div>
   <script>
+    window.xdata = [];
+    window.ydata = [];
     const xhr = new XMLHttpRequest();
     xhr.open('GET', './data/test.json', false);
     xhr.send(null);

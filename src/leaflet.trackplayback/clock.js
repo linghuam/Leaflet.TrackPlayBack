@@ -1,8 +1,13 @@
-
+/**
+ * 时钟类，控制轨迹播放动画
+ */
 export const Clock = L.Evented.extend({
 
   options: {
+    // 播放速度
+    // 计算方法 fpstime * Math.pow(2, this._speed - 1)
     speed: 13,
+    // 最大播放速度
     maxSpeed: 65
   },
 
@@ -14,33 +19,18 @@ export const Clock = L.Evented.extend({
     this._curTime = this._trackController.getMinTime()
     this._speed = this.options.speed
     this._maxSpeed = this.options.maxSpeed
+    this._intervalID = null
     this._lastFpsUpdateTime = 0
-  },
-
-  // 计算帧率 ， 单位：帧/秒，浏览器的最大值是：60帧/秒
-  caculateFps: function (now) {
-    var fps = 1000 / (now - this._lastFpsUpdateTime)
-    return fps
-  },
-
-  // 计算两帧时间间隔，单位：秒
-  caculatefpsTime: function (now) {
-    let time = (now - this._lastFpsUpdateTime) / 1000
-    if (this._lastFpsUpdateTime === 0) {
-      time = 0
-    }
-    this._lastFpsUpdateTime = now
-    return time
   },
 
   start: function () {
     if (this._intervalID) return
-    this._intervalID = window.requestAnimationFrame(this._tick.bind(this))
+    this._intervalID = L.Util.requestAnimFrame(this._tick, this)
   },
 
   stop: function () {
     if (!this._intervalID) return
-    window.cancelAnimationFrame(this._intervalID)
+    L.Util.cancelAnimFrame(this._intervalID)
     this._intervalID = null
     this._lastFpsUpdateTime = 0
   },
@@ -101,9 +91,30 @@ export const Clock = L.Evented.extend({
     }
   },
 
+  // 计算两帧时间间隔，单位：秒
+  _caculatefpsTime: function (now) {
+    let time
+    if (this._lastFpsUpdateTime === 0) {
+      time = 0
+    } else {
+      time = (now - this._lastFpsUpdateTime) / 1000
+    }
+    this._lastFpsUpdateTime = now
+    return time
+  },
+
   _tick: function () {
     let now = +new Date()
-    let fpstime = this.caculatefpsTime(now)
+    let fpstime = this._caculatefpsTime(now)
+    // 监控 -start
+    // console.log(fpstime*1000 + 'ms\n')
+    // if (window.xdata) {
+    //   window.xdata.push(window.xdata.length+1)
+    // }
+    // if (window.ydata) {
+    //   window.ydata.push(fpstime*1000)
+    // }
+    // 监控 -end
     let isPause = false
     let stepTime = fpstime * Math.pow(2, this._speed - 1)
     this._curTime += stepTime
@@ -113,7 +124,7 @@ export const Clock = L.Evented.extend({
     }
     this._trackController.drawTracksByTime(this._curTime)
     this.fire('tick', { time: this._curTime })
-    if (!isPause) this._intervalID = window.requestAnimationFrame(this._tick.bind(this))
+    if (!isPause) this._intervalID = L.Util.requestAnimFrame(this._tick, this)
   }
 })
 

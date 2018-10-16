@@ -5,7 +5,7 @@ module.exports = {
     mode: 'production',
     entry: {
         'control.trackplayback': './src/control.trackplayback/index.js',
-        'leaflet.trackplayback': ['./src/polyfill/index.js','./src/leaflet.trackplayback/index.js']
+        'leaflet.trackplayback': ['./src/leaflet.trackplayback/index.js']
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
