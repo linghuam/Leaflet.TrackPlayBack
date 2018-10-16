@@ -51,7 +51,6 @@ export const TrackPlayBackControl = L.Control.extend({
     return ret
   },
 
-
   _initContainer: function () {
     var className = 'leaflet-control-playback'
     this._container = L.DomUtil.create('div', className)
@@ -138,7 +137,7 @@ export const TrackPlayBackControl = L.Control.extend({
     return sliderEle
   },
 
-  _showTrackPoint(e) {
+  _showTrackPoint (e) {
     if (e.target.checked) {
       this.trackPlayBack.showTrackPoint()
     } else {
@@ -146,7 +145,7 @@ export const TrackPlayBackControl = L.Control.extend({
     }
   },
 
-  _showTrackLine(e) {
+  _showTrackLine (e) {
     if (e.target.checked) {
       this.trackPlayBack.showTrackLine()
     } else {

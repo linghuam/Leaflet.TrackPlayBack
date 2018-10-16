@@ -24,7 +24,7 @@ export const Track = L.Class.extend({
     for (let i = 0, len = this._trackPoints.length; i < len; i++) {
       times.push(this._trackPoints[i].time)
     }
-    return times;
+    return times
   },
 
   getStartTrackPoint: function () {
@@ -45,7 +45,7 @@ export const Track = L.Class.extend({
     var startPt = this.getStartTrackPoint()
     var endPt = this.getEndTrackPoint()
     var times = this.getTimes()
-    if (time < startPt.time || time > endPt.time) return;
+    if (time < startPt.time || time > endPt.time) return
     var left = 0
     var right = times.length - 1
     var n
@@ -63,11 +63,11 @@ export const Track = L.Class.extend({
     var t1 = times[right]
     var t = time
     if (!this.getTrackPointByTime(t0)) {
-      console.log('error');
+      console.log('error')
     }
     startPt = L.point(this.getTrackPointByTime(t0).lng, this.getTrackPointByTime(t0).lat)
     endPt = L.point(this.getTrackPointByTime(t1).lng, this.getTrackPointByTime(t1).lat)
-    var s = startPt.distanceTo(endPt);
+    var s = startPt.distanceTo(endPt)
     // 不同时间在同一个点情形
     if (s <= 0) {
       endpoint = this.getTrackPointByTime(t1)
@@ -146,6 +146,6 @@ export const Track = L.Class.extend({
   }
 })
 
-export const track = function(trackData, options) {
+export const track = function (trackData, options) {
   return new Track(trackData, options)
 }

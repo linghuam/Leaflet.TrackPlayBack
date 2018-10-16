@@ -34,12 +34,12 @@ export const Clock = L.Evented.extend({
   },
 
   start: function () {
-    if (this._intervalID) return;
+    if (this._intervalID) return
     this._intervalID = window.requestAnimationFrame(this._tick.bind(this))
   },
 
   stop: function () {
-    if (!this._intervalID) return;
+    if (!this._intervalID) return
     window.cancelAnimationFrame(this._intervalID)
     this._intervalID = null
     this._lastFpsUpdateTime = 0
@@ -52,18 +52,18 @@ export const Clock = L.Evented.extend({
   },
 
   slowSpeed: function () {
-    this._speed <= 1 ? this._speed : this._speed -= 1;
+    this._speed = this._speed <= 1 ? this._speed : this._speed - 1
     if (this._intervalID) {
-      this.stop();
-      this.start();
+      this.stop()
+      this.start()
     }
   },
 
   quickSpeed: function () {
-    this._speed >= this._maxSpeed ? this._speed : this._speed += 1;
+    this._speed = this._speed >= this._maxSpeed ? this._speed : this._speed + 1
     if (this._intervalID) {
-      this.stop();
-      this.start();
+      this.stop()
+      this.start()
     }
   },
 
@@ -84,13 +84,13 @@ export const Clock = L.Evented.extend({
   },
 
   isPlaying: function () {
-    return this._intervalID ? true : false
+    return !!this._intervalID
   },
 
   setCursor: function (time) {
     this._curTime = time
     this._trackController.drawTracksByTime(this._curTime)
-    this.fire('tick', {time: this._curTime})
+    this.fire('tick', { time: this._curTime })
   },
 
   setSpeed: function (speed) {
@@ -112,7 +112,7 @@ export const Clock = L.Evented.extend({
       isPause = true
     }
     this._trackController.drawTracksByTime(this._curTime)
-    this.fire('tick', {time: this._curTime})
+    this.fire('tick', { time: this._curTime })
     if (!isPause) this._intervalID = window.requestAnimationFrame(this._tick.bind(this))
   }
 })

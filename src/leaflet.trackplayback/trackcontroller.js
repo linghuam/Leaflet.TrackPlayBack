@@ -38,14 +38,14 @@ export const TrackController = L.Class.extend({
   },
 
   locateToFirstTrack: function () {
-    if (this._tracks.length) {
-      var track0 = this._tracks[0]
-      var spoint = track0.getStartTrackPoint();
-      if (spoint) {
-        var latlng = L.latLng(spoint.lat, spoint.lng);
-        // this._map.panTo(latlng);
-      }
-    }
+    // if (this._tracks.length) {
+    //   var track0 = this._tracks[0]
+    //   var spoint = track0.getStartTrackPoint()
+    //   if (spoint) {
+    //     var latlng = L.latLng(spoint.lat, spoint.lng)
+    //     this._map.panTo(latlng);
+    //   }
+    // }
   },
 
   addTrack: function (track) {
@@ -70,18 +70,18 @@ export const TrackController = L.Class.extend({
   },
 
   _update: function () {
-      this._minTime = this._tracks[0].getStartTrackPoint().time
-      this._maxTime = this._tracks[0].getEndTrackPoint().time
-      for (let i = 0, len = this._tracks.length; i < len; i++) {
-        let stime = this._tracks[i].getStartTrackPoint().time
-        let etime = this._tracks[i].getEndTrackPoint().time
-        if (stime < this._minTime) {
-          this._minTime = stime
-        }
-        if (etime > this._maxTime) {
-          this._maxTime = etime
-        }
+    this._minTime = this._tracks[0].getStartTrackPoint().time
+    this._maxTime = this._tracks[0].getEndTrackPoint().time
+    for (let i = 0, len = this._tracks.length; i < len; i++) {
+      let stime = this._tracks[i].getStartTrackPoint().time
+      let etime = this._tracks[i].getEndTrackPoint().time
+      if (stime < this._minTime) {
+        this._minTime = stime
       }
+      if (etime > this._maxTime) {
+        this._maxTime = etime
+      }
+    }
   },
 
   _caculateCount: function () {

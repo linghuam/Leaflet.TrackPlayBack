@@ -1,39 +1,39 @@
-import {TrackLayer} from './tracklayer'
+import { TrackLayer } from './tracklayer'
 
 export const Draw = L.Class.extend({
 
-    trackPointOptions: {
-      isDraw: false,
-      useCanvas: true,
-      stroke: false,
-      color: '#ef0300',
-      fill: true,
-      fillColor: '#ef0300',
-      opacity:0.3,
-      radius: 4
-    },
-    trackLineOptions: {
-      isDraw: false,
-      stroke: true,
-      color: '#1C54E2', // stroke color
-      weight: 2,
-      fill: false,
-      fillColor: '#000',
-      opacity:0.3
-    },
-    targetOptions: {
-      useImg: false,
-      imgUrl: '../../static/images/ship.png',
-      width: 8,
-      height: 18,
-      color: '#00f', // stroke color
-      fillColor: '#9FD12D'
-    },
-    toolTipOptions: {
-      offset: [0, 0],
-      direction: 'top',
-      permanent: false
-    },
+  trackPointOptions: {
+    isDraw: false,
+    useCanvas: true,
+    stroke: false,
+    color: '#ef0300',
+    fill: true,
+    fillColor: '#ef0300',
+    opacity: 0.3,
+    radius: 4
+  },
+  trackLineOptions: {
+    isDraw: false,
+    stroke: true,
+    color: '#1C54E2', // stroke color
+    weight: 2,
+    fill: false,
+    fillColor: '#000',
+    opacity: 0.3
+  },
+  targetOptions: {
+    useImg: false,
+    imgUrl: '../../static/images/ship.png',
+    width: 8,
+    height: 18,
+    color: '#00f', // stroke color
+    fillColor: '#9FD12D'
+  },
+  toolTipOptions: {
+    offset: [0, 0],
+    direction: 'top',
+    permanent: false
+  },
 
   initialize: function (map, options) {
     this.trackPointOptions = L.extend(this.trackPointOptions, options.trackPointOptions)
@@ -106,7 +106,7 @@ export const Draw = L.Class.extend({
       this._clearLayer()
       this._bufferTracks.forEach(function (element, index) {
         this._drawTrack(element, false)
-      }.bind(this));
+      }.bind(this))
     }
   },
 
@@ -121,7 +121,7 @@ export const Draw = L.Class.extend({
           let tpoint = this._map.latLngToLayerPoint(L.latLng(this._bufferTracks[i][j].lat, this._bufferTracks[i][j].lng))
           if (point.distanceTo(tpoint) <= this.trackPointOptions.radius) {
             this._opentoolTip(this._bufferTracks[i][j])
-            return;
+            return
           }
         }
       }
@@ -199,7 +199,7 @@ export const Draw = L.Class.extend({
         let point = this._map.latLngToLayerPoint(latLng)
         this._ctx.beginPath()
         this._ctx.arc(point.x, point.y, radius, 0, Math.PI * 2, false)
-        this._ctx.globalAlpha = options.opacity;
+        this._ctx.globalAlpha = options.opacity
         if (options.stroke) {
           this._ctx.strokeStyle = options.color
           this._ctx.stroke()
@@ -257,7 +257,7 @@ export const Draw = L.Class.extend({
       x: width / 2,
       y: height / 2
     }
-    var img = new Image()
+    var img = new window.Image()
     img.onload = function () {
       this._ctx.save()
       this._ctx.translate(point.x, point.y)
@@ -269,8 +269,8 @@ export const Draw = L.Class.extend({
   },
 
   _getTooltipText: function (targetobj) {
-    var content = [];
-    content.push('<table>');
+    var content = []
+    content.push('<table>')
     if (targetobj.info && targetobj.info.length) {
       for (let i = 0, len = targetobj.info.length; i < len; i++) {
         content.push('<tr>')
@@ -279,18 +279,18 @@ export const Draw = L.Class.extend({
         content.push('</tr>')
       }
     }
-    content.push('</table>');
-    content = content.join('');
-    return content;
+    content.push('</table>')
+    content = content.join('')
+    return content
   },
 
   _clearLayer: function () {
     var bounds = this._trackLayer.getBounds()
     if (bounds) {
-      var size = bounds.getSize();
-      this._ctx.clearRect(bounds.min.x, bounds.min.y, size.x, size.y);
+      var size = bounds.getSize()
+      this._ctx.clearRect(bounds.min.x, bounds.min.y, size.x, size.y)
     } else {
-      this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
+      this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height)
     }
     if (this._map.hasLayer(this._trackPointFeatureGroup)) {
       this._trackPointFeatureGroup.clearLayers()

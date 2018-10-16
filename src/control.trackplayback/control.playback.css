@@ -1,13 +1,23 @@
 .leaflet-control-playback{position:relative;background-color:#7cbdf5;padding:10px;}
 .leaflet-control-playback .optionsContainer{position:relative;}
 .leaflet-control-playback .buttonContainer {}
+.leaflet-control-playback .buttonContainer .btn-stop {
+    background: url(./images/icon-stop.png) no-repeat center;
+}
+.leaflet-control-playback .buttonContainer .btn-start {
+    background: url(./images/icon-play.png) no-repeat center;
+}
+.leaflet-control-playback .buttonContainer .btn-restart {
+    background: url(./images/icon-restart.png) no-repeat center;
+}
+.leaflet-control-playback .buttonContainer .btn-slow {
+    background: url(./images/icon-slow.png) no-repeat center;
+}
+.leaflet-control-playback .buttonContainer .btn-quick {
+    background:  url(./images/icon-quick.png) no-repeat center;
+}
+.leaflet-control-playback .buttonContainer .btn-close {
+    background: url(./images/icon-close.png)   no-repeat center;
+}
 .leaflet-control-playback .infoContainer {}
 .leaflet-control-playback .sliderContainer {}
-
-
-
-
-.leaflet-control-playback .scrollContainer{position:relative;text-align:center;}
-
-.leaflet-control-playback .operateContainer span{font-size:22px;cursor:pointer;margin:0 6px;}
-.leaflet-control-playback .scrollContainer .stime{margin-right:12px;}
