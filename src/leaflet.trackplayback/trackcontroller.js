@@ -1,28 +1,35 @@
-import { isArray } from './util'
-import { Track } from './track'
+import {
+  isArray
+} from './util'
+import {
+  Track
+} from './track'
 
 export const TrackController = L.Class.extend({
 
   initialize: function (tracks = [], draw, options) {
     L.setOptions(this, options)
 
-    if (isArray(tracks)) {
-      this._tracks = tracks
-    } else if (tracks instanceof Track) {
-      this._tracks = [tracks]
-    } else {
-      throw new Error('track must be an instance of `Track` or an array of `Track` instance!')
-    }
+    // if (isArray(tracks)) {
+    //   this._tracks = tracks
+    // } else if (tracks instanceof Track) {
+    //   this._tracks = [tracks]
+    // } else {
+    //   throw new Error('tracks must be an instance of `Track` or an array of `Track` instance!')
+    // }
+
+    this._tracks = []
+    this.addTrack(tracks)
 
     this._draw = draw
 
     // this._map = map
 
-    this._minTime = null
+    // this._minTime = null
 
-    this._maxTime = null
+    // this._maxTime = null
 
-    this._update()
+    this._updateTime()
 
     // this._caculateCount()
 
@@ -37,26 +44,27 @@ export const TrackController = L.Class.extend({
     return this._maxTime
   },
 
-  locateToFirstTrack: function () {
-    // if (this._tracks.length) {
-    //   var track0 = this._tracks[0]
-    //   var spoint = track0.getStartTrackPoint()
-    //   if (spoint) {
-    //     var latlng = L.latLng(spoint.lat, spoint.lng)
-    //     this._map.panTo(latlng);
-    //   }
-    // }
-  },
+  // locateToFirstTrack: function () {
+  // if (this._tracks.length) {
+  //   var track0 = this._tracks[0]
+  //   var spoint = track0.getStartTrackPoint()
+  //   if (spoint) {
+  //     var latlng = L.latLng(spoint.lat, spoint.lng)
+  //     this._map.panTo(latlng);
+  //   }
+  // }
+  // },
 
   addTrack: function (track) {
     if (isArray(track)) {
       for (let i = 0, len = track.length; i < len; i++) {
         this.addTrack(track[i])
       }
-    }
-    if (track instanceof Track) {
+    } else if (track instanceof Track) {
       this._tracks.push(track)
-      this._update()
+      this._updateTime()
+    } else {
+      throw new Error('tracks must be an instance of `Track` or an array of `Track` instance!')
     }
   },
 
@@ -69,7 +77,7 @@ export const TrackController = L.Class.extend({
     }
   },
 
-  _update: function () {
+  _updateTime: function () {
     this._minTime = this._tracks[0].getStartTrackPoint().time
     this._maxTime = this._tracks[0].getEndTrackPoint().time
     for (let i = 0, len = this._tracks.length; i < len; i++) {
@@ -84,15 +92,15 @@ export const TrackController = L.Class.extend({
     }
   },
 
-  _caculateCount: function () {
-    var shipCount = this._tracks.length
-    var pointCount = 0
-    for (let i = 0, len = shipCount; i < len; i++) {
-      pointCount += this._tracks[i]._trackPoints.length
-    }
-    console.log('共有: ' + shipCount + '艘船;')
-    console.log('共有: ' + pointCount + '个轨迹点;')
-  }
+  // _caculateCount: function () {
+  //   var shipCount = this._tracks.length
+  //   var pointCount = 0
+  //   for (let i = 0, len = shipCount; i < len; i++) {
+  //     pointCount += this._tracks[i]._trackPoints.length
+  //   }
+  //   console.log('共有: ' + shipCount + '艘船;')
+  //   console.log('共有: ' + pointCount + '个轨迹点;')
+  // }
 
 })
 

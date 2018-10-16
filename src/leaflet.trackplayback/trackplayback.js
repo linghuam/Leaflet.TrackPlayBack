@@ -1,7 +1,15 @@
-import { Track } from './track'
-import { TrackController } from './trackcontroller'
-import { Clock } from './clock'
-import { Draw } from './draw'
+import {
+  Track
+} from './track'
+import {
+  TrackController
+} from './trackcontroller'
+import {
+  Clock
+} from './clock'
+import {
+  Draw
+} from './draw'
 import * as Util from './util'
 
 /**

@@ -80,7 +80,9 @@ export const Clock = L.Evented.extend({
   setCursor: function (time) {
     this._curTime = time
     this._trackController.drawTracksByTime(this._curTime)
-    this.fire('tick', { time: this._curTime })
+    this.fire('tick', {
+      time: this._curTime
+    })
   },
 
   setSpeed: function (speed) {
@@ -106,15 +108,6 @@ export const Clock = L.Evented.extend({
   _tick: function () {
     let now = +new Date()
     let fpstime = this._caculatefpsTime(now)
-    // 监控 -start
-    // console.log(fpstime*1000 + 'ms\n')
-    // if (window.xdata) {
-    //   window.xdata.push(window.xdata.length+1)
-    // }
-    // if (window.ydata) {
-    //   window.ydata.push(fpstime*1000)
-    // }
-    // 监控 -end
     let isPause = false
     let stepTime = fpstime * Math.pow(2, this._speed - 1)
     this._curTime += stepTime
@@ -123,7 +116,9 @@ export const Clock = L.Evented.extend({
       isPause = true
     }
     this._trackController.drawTracksByTime(this._curTime)
-    this.fire('tick', { time: this._curTime })
+    this.fire('tick', {
+      time: this._curTime
+    })
     if (!isPause) this._intervalID = L.Util.requestAnimFrame(this._tick, this)
   }
 })

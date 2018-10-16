@@ -1,4 +1,6 @@
-import { isArray } from './util'
+import {
+  isArray
+} from './util'
 
 export const Track = L.Class.extend({
 
@@ -41,14 +43,14 @@ export const Track = L.Class.extend({
 
   getCalculateTrackPointByTime: function (time) {
     // 先判断最后一个点是否为原始点
-    var endpoint = this.getTrackPointByTime(time)
-    var startPt = this.getStartTrackPoint()
-    var endPt = this.getEndTrackPoint()
-    var times = this.getTimes()
+    let endpoint = this.getTrackPointByTime(time)
+    let startPt = this.getStartTrackPoint()
+    let endPt = this.getEndTrackPoint()
+    let times = this.getTimes()
     if (time < startPt.time || time > endPt.time) return
-    var left = 0
-    var right = times.length - 1
-    var n
+    let left = 0
+    let right = times.length - 1
+    let n
     // 处理只有一个点情况
     if (left === right) {
       return endpoint
@@ -59,27 +61,27 @@ export const Track = L.Class.extend({
       else right = n
     }
 
-    var t0 = times[left]
-    var t1 = times[right]
-    var t = time
+    let t0 = times[left]
+    let t1 = times[right]
+    let t = time
     if (!this.getTrackPointByTime(t0)) {
-      console.log('error')
+      throw new Error('data error!')
     }
     startPt = L.point(this.getTrackPointByTime(t0).lng, this.getTrackPointByTime(t0).lat)
     endPt = L.point(this.getTrackPointByTime(t1).lng, this.getTrackPointByTime(t1).lat)
-    var s = startPt.distanceTo(endPt)
+    let s = startPt.distanceTo(endPt)
     // 不同时间在同一个点情形
     if (s <= 0) {
       endpoint = this.getTrackPointByTime(t1)
       return endpoint
     }
-    var v = s / (t1 - t0)
-    var sinx = (endPt.y - startPt.y) / s
-    var cosx = (endPt.x - startPt.x) / s
-    var step = v * (t - t0)
-    var x = startPt.x + step * cosx
-    var y = startPt.y + step * sinx
-    var dir = endPt.x >= startPt.x ? (Math.PI * 0.5 - Math.asin(sinx)) * 180 / Math.PI : (Math.PI * 1.5 + Math.asin(sinx)) * 180 / Math.PI
+    let v = s / (t1 - t0)
+    let sinx = (endPt.y - startPt.y) / s
+    let cosx = (endPt.x - startPt.x) / s
+    let step = v * (t - t0)
+    let x = startPt.x + step * cosx
+    let y = startPt.y + step * sinx
+    let dir = endPt.x >= startPt.x ? (Math.PI * 0.5 - Math.asin(sinx)) * 180 / Math.PI : (Math.PI * 1.5 + Math.asin(sinx)) * 180 / Math.PI
 
     if (endpoint) {
       if (endpoint.dir === undefined) {
@@ -98,13 +100,13 @@ export const Track = L.Class.extend({
   },
 
   getTrackPointsBeforeTime: function (time) {
-    var tpoints = []
+    let tpoints = []
     for (let i = 0, len = this._trackPoints.length; i < len; i++) {
       if (this._trackPoints[i].time < time) {
         tpoints.push(this._trackPoints[i])
       }
     }
-    var endPt = this.getCalculateTrackPointByTime(time)
+    let endPt = this.getCalculateTrackPointByTime(time)
     if (endPt) {
       tpoints.push(endPt)
     }
@@ -123,7 +125,7 @@ export const Track = L.Class.extend({
   },
 
   _sortTrackPointsByTime: function () {
-    var len = this._trackPoints.length
+    let len = this._trackPoints.length
     for (let i = 0; i < len; i++) {
       for (let j = 0; j < len - 1 - i; j++) {
         if (this._trackPoints[j].time > this._trackPoints[j + 1].time) {
