@@ -11,7 +11,7 @@ export const TrackPlayBackControl = L.Control.extend({
   initialize: function (trackplayback, options) {
     L.Control.prototype.initialize.call(this, options)
     this.trackPlayBack = trackplayback
-    this.trackPlayBack.on('tick', this._tickCallback)
+    this.trackPlayBack.on('tick', this._tickCallback, this)
   },
 
   onAdd: function (map) {
@@ -20,7 +20,8 @@ export const TrackPlayBackControl = L.Control.extend({
   },
 
   onRemove: function (map) {
-
+    this.trackPlayBack.dispose()
+    this.trackPlayBack.off('tick', this._tickCallback, this)
   },
 
   /**
@@ -54,7 +55,7 @@ export const TrackPlayBackControl = L.Control.extend({
   _initContainer: function () {
     var className = 'leaflet-control-playback'
     this._container = L.DomUtil.create('div', className)
-    L.DomEvent.stopPropagation(this._container)
+    L.DomEvent.disableClickPropagation(this._container)
 
     this._optionsContainer = this._createContainer('optionsContainer', this._container)
     this._buttonContainer = this._createContainer('buttonContainer', this._container)
@@ -70,10 +71,10 @@ export const TrackPlayBackControl = L.Control.extend({
     this._quickSpeedBtn = this._createButton('加速', 'btn-quick', this._buttonContainer, this._quick)
     this._closeBtn = this._createButton('关闭', 'btn-close', this._buttonContainer, this._close)
 
-    this._infoStartTime = this._createInfo(this.trackPlayBack.getStartTime(), 'info-start-time', this._infoContainer)
-    this._infoEndTime = this._createInfo(this.trackPlayBack.getEndTime(), 'info-end-time', this._infoContainer)
-    this._infoCurTime = this._createInfo(this.trackPlayBack.getCurTime(), 'info-cur-time', this._infoContainer)
-    this._infoSpeedRatio = this._createInfo(`X${this.trackPlayBack.getSpeed()}`, 'info-speed-ratio', this._infoContainer)
+    this._infoStartTime = this._createInfo('开始时间', this.getTimeStrFromUnix(this.trackPlayBack.getStartTime()), 'info-start-time', this._infoContainer)
+    this._infoEndTime = this._createInfo('结束时间', this.getTimeStrFromUnix(this.trackPlayBack.getEndTime()), 'info-end-time', this._infoContainer)
+    this._infoCurTime = this._createInfo('当前时间', this.getTimeStrFromUnix(this.trackPlayBack.getCurTime()), 'info-cur-time', this._infoContainer)
+    this._infoSpeedRatio = this._createInfo('速度', `X${this.trackPlayBack.getSpeed()}`, 'info-speed-ratio', this._infoContainer)
 
     this._slider = this._createSlider('time-slider', this._sliderContainer, this._scrollchange)
 
@@ -96,7 +97,6 @@ export const TrackPlayBackControl = L.Control.extend({
     labelEle.setAttribute('for', inputId)
     labelEle.innerHTML = labelName
 
-    L.DomEvent.stopPropagation(inputEle)
     L.DomEvent.on(inputEle, 'change', fn, this)
 
     return divEle
@@ -119,8 +119,11 @@ export const TrackPlayBackControl = L.Control.extend({
     return link
   },
 
-  _createInfo: function (info, className, container) {
-    let infoEle = L.DomUtil.create('span', className, container)
+  _createInfo: function (title, info, className, container) {
+    let infoContainer = L.DomUtil.create('div','info-container', container)
+    let infoTitle = L.DomUtil.create('span', 'info-title', infoContainer)
+    infoTitle.innerHTML = title
+    let infoEle = L.DomUtil.create('span', className, infoContainer)
     infoEle.innerHTML = info
     return infoEle
   },
@@ -128,6 +131,9 @@ export const TrackPlayBackControl = L.Control.extend({
   _createSlider: function (className, container, fn) {
     let sliderEle = L.DomUtil.create('input', className, container)
     sliderEle.setAttribute('type', 'range')
+    sliderEle.setAttribute('min', this.trackPlayBack.getStartTime())
+    sliderEle.setAttribute('max', this.trackPlayBack.getEndTime())
+    sliderEle.setAttribute('value', this.trackPlayBack.getCurTime())
 
     L.DomEvent.on(sliderEle, 'click mousedown dbclick', L.DomEvent.stopPropagation)
       .on(sliderEle, 'click', L.DomEvent.preventDefault)
@@ -218,5 +224,5 @@ export const TrackPlayBackControl = L.Control.extend({
 })
 
 export const trackplaybackcontrol = function (trackplayback, options) {
-  return new L.Control.PlayBack(trackplayback, options)
+  return new TrackPlayBackControl(trackplayback, options)
 }

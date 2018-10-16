@@ -84,7 +84,7 @@ export const Draw = L.Class.extend({
     this.update()
   },
 
-  removeLayer: function () {
+  remove: function () {
     this._bufferTracks = []
     this._trackLayer.off('update', this._trackLayerUpdate, this)
     this._map.off('mousemove', this._onmousemoveEvt, this)

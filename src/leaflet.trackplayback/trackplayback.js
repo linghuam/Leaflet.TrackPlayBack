@@ -92,6 +92,9 @@ export const TrackPlayBack = L.Evented.extend({
     this.draw.hideTrackLine()
     return this
   },
+  dispose: function () {
+    this.draw.remove()
+  },
   _initTracks: function (data) {
     let tracks = []
     if (Util.isArray(data)) {
