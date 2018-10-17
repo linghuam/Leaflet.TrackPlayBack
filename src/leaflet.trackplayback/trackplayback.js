@@ -32,7 +32,7 @@ export const TrackPlayBack = L.Evented.extend({
     this.trackController = new TrackController(this.tracks, this.draw)
     this.clock = new Clock(this.trackController, options.clockOptions)
 
-    this.clock.on('tick', this._tick)
+    this.clock.on('tick', this._tick, this)
   },
   addTrack: function () {
 
