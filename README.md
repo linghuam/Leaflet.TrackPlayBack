@@ -22,9 +22,6 @@ Using npm:
 npm i leaflet-plugin-trackplayback
 ```
 
-```js
-```
-
 Using script tag:
 
 ```html
@@ -36,6 +33,8 @@ Using script tag:
   <script src="../dist/control.trackplayback.js"></script>
   <script src="../dist/leaflet.trackplayback.js"></script>
 ```
+
+example:
 
 ```js
     const trackplayback = L.trackplayback(data, map);
@@ -50,19 +49,19 @@ Using script tag:
 
 `data` can be:
 
+when you want to play back one track
+
 ```
 [{lat:30, lng:116, time:1502529980, dir:320, info:[{key: 'name', value: 'ship1'}]}, ....]
 ```
 
-when you want to play back one track
-
 or
+
+when you want to play back more tracks
 
 ```
 [[{lat:30, lng:116, time:1502529980, dir:320, info:[]}, ....], [{lat:30, lng:116, time:1502529980, dir:320, info:[]}, ....]]
 ```
-
-when you want to play back one more track.
 
 the trackpoint obj properties:
 
@@ -132,14 +131,6 @@ const Options = {
 
 ```
 
-example:
-
-```js
-const trackplayback = L.trackplayback(data, map, options)
-// or
-const trackplayback = new L.TrackPlayBack(data, map, options)
-```
-
 ### events
 
 ```js
@@ -151,67 +142,67 @@ trackplayback.on('tick', e => {
 
 ### methods
 
-#### trackplayback.start()
+#### start()
 
 start play, return this
 
-#### trackplayback.stop()
+#### stop()
 
 stop play, return this
 
-#### trackplayback.rePlaying()
+#### rePlaying()
 
 replay, return this
 
-#### trackplayback.slowSpeed()
+#### slowSpeed()
 
 slow play speed, return this
 
-#### trackplayback.quickSpeed()
+#### quickSpeed()
 
 quick play speed, return this
 
-#### trackplayback.getSpeed()
+#### getSpeed()
 
 get play speed, return speed value
 
-#### trackplayback.getCurTime()
+#### getCurTime()
 
 get current time, return unix timestamp
 
-#### trackplayback.getStartTime()
+#### getStartTime()
 
 get start time, return unix timestamp
 
-#### trackplayback.getEndTime()
+#### getEndTime()
 
 get end time, return unix timestamp
 
-#### trackplayback.isPlaying()
+#### isPlaying()
 
 whether in playing, return true or false
 
-#### trackplayback.setCursor(time)
+#### setCursor(time)
 
 set current playing time, need a unix timestamp param, return this
 
-#### trackplayback.setSpeed(speed)
+#### setSpeed(speed)
 
 set the playback speed, return this
 
-#### trackplayback.showTrackPoint()
+#### showTrackPoint()
 
 draw track point, return this
 
-#### trackplayback.hideTrackPoint()
+#### hideTrackPoint()
 
 remove track point, return this
 
-#### trackplayback.showTrackLine()
+#### showTrackLine()
 
 draw track line, return this
 
-#### trackplayback.hideTrackLine()
+#### hideTrackLine()
 
 remove track line, return this
 
