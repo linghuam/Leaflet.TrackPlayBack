@@ -1,3 +1,6 @@
+/**
+ * 轨迹图层
+ */
 export const TrackLayer = L.Renderer.extend({
 
   initialize: function (options) {

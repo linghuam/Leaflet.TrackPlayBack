@@ -2,6 +2,10 @@ import {
   TrackLayer
 } from './tracklayer'
 
+/**
+ * 绘制类
+ * 完成轨迹线、轨迹点、目标物的绘制工作
+ */
 export const Draw = L.Class.extend({
 
   trackPointOptions: {

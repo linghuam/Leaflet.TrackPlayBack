@@ -5,6 +5,10 @@ import {
   Track
 } from './track'
 
+/**
+ * 控制器类
+ * 控制轨迹和绘制
+ */
 export const TrackController = L.Class.extend({
 
   initialize: function (tracks = [], draw, options) {

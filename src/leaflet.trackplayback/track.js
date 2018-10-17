@@ -2,6 +2,9 @@ import {
   isArray
 } from './util'
 
+/**
+ * 轨迹类
+ */
 export const Track = L.Class.extend({
 
   initialize: function (trackData = [], options) {
