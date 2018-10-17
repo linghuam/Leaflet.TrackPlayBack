@@ -7,6 +7,9 @@ export const Track = L.Class.extend({
   initialize: function (trackData = [], options) {
     L.setOptions(this, options)
 
+    trackData.forEach(item => {
+      item.isOrigin = true
+    })
     this._trackPoints = trackData
     this._timeTick = {}
     this._update()

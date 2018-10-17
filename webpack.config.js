@@ -3,6 +3,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 module.exports = {
     mode: 'production',
+    devtool: 'source-map',
     entry: {
         'control.trackplayback': './src/control.trackplayback/index.js',
         'leaflet.trackplayback': ['./src/leaflet.trackplayback/index.js']

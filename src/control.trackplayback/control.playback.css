@@ -11,10 +11,10 @@
     text-decoration: none;
 }
 .leaflet-control-playback .buttonContainer .btn-stop {
-    background: url(./images/icon-stop.png) no-repeat center;
+    background: url(./images/icon-play.png) no-repeat center;
 }
 .leaflet-control-playback .buttonContainer .btn-start {
-    background: url(./images/icon-play.png) no-repeat center;
+    background: url(./images/icon-stop.png) no-repeat center;
 }
 .leaflet-control-playback .buttonContainer .btn-restart {
     background: url(./images/icon-restart.png) no-repeat center;
