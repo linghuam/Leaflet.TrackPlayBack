@@ -11,6 +11,7 @@ export const Track = L.Class.extend({
     L.setOptions(this, options)
 
     trackData.forEach(item => {
+      // 添加 isOrigin 字段用来标识是否是原始采样点，与插值点区分开
       item.isOrigin = true
     })
     this._trackPoints = trackData
@@ -47,13 +48,13 @@ export const Track = L.Class.extend({
     return this._trackPoints[this._timeTick[time]]
   },
 
-  getCalculateTrackPointByTime: function (time) {
+  _getCalculateTrackPointByTime: function (time) {
     // 先判断最后一个点是否为原始点
     let endpoint = this.getTrackPointByTime(time)
     let startPt = this.getStartTrackPoint()
     let endPt = this.getEndTrackPoint()
     let times = this.getTimes()
-    if (time < startPt.time || time > endPt.time) return
+    if (time < startPt.time || time > endPt.time) return;
     let left = 0
     let right = times.length - 1
     let n
@@ -61,6 +62,7 @@ export const Track = L.Class.extend({
     if (left === right) {
       return endpoint
     }
+    // 通过二分查找法查出当前时间所在的时间区间
     while (right - left !== 1) {
       n = parseInt((left + right) / 2)
       if (time > times[n]) left = n
@@ -70,23 +72,25 @@ export const Track = L.Class.extend({
     let t0 = times[left]
     let t1 = times[right]
     let t = time
-    if (!this.getTrackPointByTime(t0)) {
-      throw new Error('data error!')
-    }
-    startPt = L.point(this.getTrackPointByTime(t0).lng, this.getTrackPointByTime(t0).lat)
-    endPt = L.point(this.getTrackPointByTime(t1).lng, this.getTrackPointByTime(t1).lat)
+    let p0 = this.getTrackPointByTime(t0)
+    let p1 = this.getTrackPointByTime(t1)
+    startPt = L.point(p0.lng, p0.lat)
+    endPt = L.point(p1.lng, p1.lat)
     let s = startPt.distanceTo(endPt)
     // 不同时间在同一个点情形
     if (s <= 0) {
-      endpoint = this.getTrackPointByTime(t1)
+      endpoint = p1
       return endpoint
     }
+    // 假设目标在两点间做匀速直线运动
+    // 求解速度向量，并计算时间 t 目标所在位置
     let v = s / (t1 - t0)
     let sinx = (endPt.y - startPt.y) / s
     let cosx = (endPt.x - startPt.x) / s
     let step = v * (t - t0)
     let x = startPt.x + step * cosx
     let y = startPt.y + step * sinx
+    // 求目标的运动方向，0-360度
     let dir = endPt.x >= startPt.x ? (Math.PI * 0.5 - Math.asin(sinx)) * 180 / Math.PI : (Math.PI * 1.5 + Math.asin(sinx)) * 180 / Math.PI
 
     if (endpoint) {
@@ -105,6 +109,7 @@ export const Track = L.Class.extend({
     return endpoint
   },
 
+  // 获取某个时间点之前走过的轨迹
   getTrackPointsBeforeTime: function (time) {
     let tpoints = []
     for (let i = 0, len = this._trackPoints.length; i < len; i++) {
@@ -112,7 +117,8 @@ export const Track = L.Class.extend({
         tpoints.push(this._trackPoints[i])
       }
     }
-    let endPt = this.getCalculateTrackPointByTime(time)
+    // 获取最后一个点，根据时间线性插值而来
+    let endPt = this._getCalculateTrackPointByTime(time)
     if (endPt) {
       tpoints.push(endPt)
     }
@@ -130,6 +136,7 @@ export const Track = L.Class.extend({
     this._updatetimeTick()
   },
 
+  // 轨迹点按时间排序
   _sortTrackPointsByTime: function () {
     let len = this._trackPoints.length
     for (let i = 0; i < len; i++) {
@@ -143,9 +150,7 @@ export const Track = L.Class.extend({
     }
   },
 
-  /**
-   * 为轨迹点建立时间索引，优化查找性能
-   */
+  // 为轨迹点建立时间索引，优化查找性能
   _updatetimeTick: function () {
     this._timeTick = {}
     for (let i = 0, len = this._trackPoints.length; i < len; i++) {
