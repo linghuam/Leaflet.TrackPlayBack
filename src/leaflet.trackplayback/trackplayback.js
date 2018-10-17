@@ -96,6 +96,10 @@ export const TrackPlayBack = L.Evented.extend({
   dispose: function () {
     this.clock.off('tick', this._tick)
     this.draw.remove()
+    this.tracks = null
+    this.draw = null
+    this.trackController = null
+    this.clock = null
   },
   _tick: function (e) {
     this.fire('tick', e)
