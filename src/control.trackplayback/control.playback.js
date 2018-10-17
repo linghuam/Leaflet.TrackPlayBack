@@ -62,19 +62,19 @@ export const TrackPlayBackControl = L.Control.extend({
     this._infoContainer = this._createContainer('infoContainer', this._container)
     this._sliderContainer = this._createContainer('sliderContainer', this._container)
 
-    this._pointCbx = this._createCheckbox('显示轨迹点', 'show-trackpoint', this._optionsContainer, this._showTrackPoint)
-    this._lineCbx = this._createCheckbox('显示轨迹线', 'show-trackLine', this._optionsContainer, this._showTrackLine)
+    this._pointCbx = this._createCheckbox('show trackPoint', 'show-trackpoint', this._optionsContainer, this._showTrackPoint)
+    this._lineCbx = this._createCheckbox('show trackLine', 'show-trackLine', this._optionsContainer, this._showTrackLine)
 
-    this._playBtn = this._createButton('播放', 'btn-stop', this._buttonContainer, this._play)
-    this._restartBtn = this._createButton('重播', 'btn-restart', this._buttonContainer, this._restart)
-    this._slowSpeedBtn = this._createButton('减速', 'btn-slow', this._buttonContainer, this._slow)
-    this._quickSpeedBtn = this._createButton('加速', 'btn-quick', this._buttonContainer, this._quick)
-    this._closeBtn = this._createButton('关闭', 'btn-close', this._buttonContainer, this._close)
+    this._playBtn = this._createButton('play', 'btn-stop', this._buttonContainer, this._play)
+    this._restartBtn = this._createButton('replay', 'btn-restart', this._buttonContainer, this._restart)
+    this._slowSpeedBtn = this._createButton('slow', 'btn-slow', this._buttonContainer, this._slow)
+    this._quickSpeedBtn = this._createButton('quick', 'btn-quick', this._buttonContainer, this._quick)
+    this._closeBtn = this._createButton('close', 'btn-close', this._buttonContainer, this._close)
 
-    this._infoStartTime = this._createInfo('开始时间', this.getTimeStrFromUnix(this.trackPlayBack.getStartTime()), 'info-start-time', this._infoContainer)
-    this._infoEndTime = this._createInfo('结束时间', this.getTimeStrFromUnix(this.trackPlayBack.getEndTime()), 'info-end-time', this._infoContainer)
-    this._infoCurTime = this._createInfo('当前时间', this.getTimeStrFromUnix(this.trackPlayBack.getCurTime()), 'info-cur-time', this._infoContainer)
-    this._infoSpeedRatio = this._createInfo('速度', `X${this.trackPlayBack.getSpeed()}`, 'info-speed-ratio', this._infoContainer)
+    this._infoStartTime = this._createInfo('startTime: ', this.getTimeStrFromUnix(this.trackPlayBack.getStartTime()), 'info-start-time', this._infoContainer)
+    this._infoEndTime = this._createInfo('endTime: ', this.getTimeStrFromUnix(this.trackPlayBack.getEndTime()), 'info-end-time', this._infoContainer)
+    this._infoCurTime = this._createInfo('curTime: ', this.getTimeStrFromUnix(this.trackPlayBack.getCurTime()), 'info-cur-time', this._infoContainer)
+    this._infoSpeedRatio = this._createInfo('speed: ', `X${this.trackPlayBack.getSpeed()}`, 'info-speed-ratio', this._infoContainer)
 
     this._slider = this._createSlider('time-slider', this._sliderContainer, this._scrollchange)
 
@@ -164,12 +164,12 @@ export const TrackPlayBackControl = L.Control.extend({
     if (hasClass) {
       L.DomUtil.removeClass(this._playBtn, 'btn-stop')
       L.DomUtil.addClass(this._playBtn, 'btn-start')
-      this._playBtn.setAttribute('title', '停止')
+      this._playBtn.setAttribute('title', 'stop')
       this.trackPlayBack.start()
     } else {
       L.DomUtil.removeClass(this._playBtn, 'btn-start')
       L.DomUtil.addClass(this._playBtn, 'btn-stop')
-      this._playBtn.setAttribute('title', '播放')
+      this._playBtn.setAttribute('title', 'play')
       this.trackPlayBack.stop()
     }
   },
@@ -178,7 +178,7 @@ export const TrackPlayBackControl = L.Control.extend({
     // 播放开始改变播放按钮样式
     L.DomUtil.removeClass(this._playBtn, 'btn-stop')
     L.DomUtil.addClass(this._playBtn, 'btn-start')
-    this._playBtn.setAttribute('title', '停止')
+    this._playBtn.setAttribute('title', 'stop')
     this.trackPlayBack.rePlaying()
   },
 
@@ -217,7 +217,7 @@ export const TrackPlayBackControl = L.Control.extend({
     if (e.time >= this.trackPlayBack.getEndTime()) {
       L.DomUtil.removeClass(this._playBtn, 'btn-start')
       L.DomUtil.addClass(this._playBtn, 'btn-stop')
-      this._playBtn.setAttribute('title', '播放')
+      this._playBtn.setAttribute('title', 'play')
       this.trackPlayBack.stop()
     }
   }
