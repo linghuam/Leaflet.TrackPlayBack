@@ -2,92 +2,226 @@
 
 ## Introduce
 
-It's a track playback plugin based on leaflet.You need provide some GPS data and time data, then you can play the track on the map.Support track playback, pause, fast forward, fast reverse operation.
+It's a track playback plugin based on leaflet and HTML5 canvas. To use it,you need provide some GPS data and time data, then you can play the track on the map.
+
+Support track playback, pause, fast forward, fast reverse operation.
 
 ## Requirements
 
 - leaflet version: >=0.7
-- bootstrap3.7.7 (if you need playbackControl)
 
 ## Demo
 
-[Demo](https://linghuam.github.io/Leaflet.TrackPlayback/)
-
-![效果图1](./static/images/1.png)
-
-![效果图2](./static/images/2.png)
-
+[Click here to see demo](https://linghuam.github.io/Leaflet.TrackPlayBack/)
 
 ## Usage
 
-``` bash
-# install dependencies
-npm install
+Using npm:
 
-# 生成 dist/LeafletPlayback.js文件
-npm run dev
-
-# 生成 dist/LeafletPlayback.min.js文件
-npm run build
-
+```shell
+npm i leaflet-plugin-trackplayback
 ```
-具体使用方法参照[index.html](index.html)页面
 
+```js
+```
 
-## Example
+Using script tag:
 
-[查看Demo](https://linghuam.github.io/TrackPlayback/)
+```html
+  <link rel="stylesheet" href="./lib/leaflet/leaflet.css">
+  <!--Optional (only if you need plaback control)-->
+  <link rel="stylesheet" href="../dist/control.playback.css">
+  <script src="./lib/leaflet/leaflet.js"></script>
+  <!--Optional (only if you need plaback control)-->
+  <script src="../dist/control.trackplayback.js"></script>
+  <script src="../dist/leaflet.trackplayback.js"></script>
+```
 
-``` javascript
-// 调用代码
-var map = L.map('leaflet-map').setView([34, 133], 8)
-L.tileLayer.GoogleLayer().addTo(map)
-$.getJSON('src/assets/data/3.json', function (Data) {
-  L.control.playback({
-    data: Data
-  }).addTo(map)
-})
+```js
+    const trackplayback = L.trackplayback(data, map);
+    // Optional  (only if you need plaback control)
+    const trackplaybackControl = L.trackplaybackcontrol(trackplayback);
+    trackplaybackControl.addTo(map);
 ```
 
 ## API reference
 
+### constructor(data, map, options)
 
-假设物体是以直线运动的。
-不考虑GPS点位漂移及信号中断问题。
-
-## Custome your Data
-
-you can change the method '_dataTransform' in 'src/control.playback/control.playback.js'
-
-to transform data to standard format like this.
+`data` can be:
 
 ```
-// standard format data
-[
-  {
-    timePosList: [{lat:30, lng:116, time:1502529980, dir:320, heading:300, info:[]}, ....]
+[{lat:30, lng:116, time:1502529980, dir:320, info:[{key: 'name', value: 'ship1'}]}, ....]
+```
+
+when you want to play back one track
+
+or
+
+```
+[[{lat:30, lng:116, time:1502529980, dir:320, info:[]}, ....], [{lat:30, lng:116, time:1502529980, dir:320, info:[]}, ....]]
+```
+
+when you want to play back one more track.
+
+the trackpoint obj properties:
+
+- lat: Latitude of target
+- lng: Longitude of target
+- time: unix timestamp
+- dir(Optional): Moving direction(0-360 degrees, Clockwise direction), if you don't provide it, the program can auto caculate the target direction
+- info(Optional): other static information of the target, it's an array of key-value pairs
+
+
+`map` is the L.map instance.
+
+
+`options` can be:
+
+```js
+const Options = {
+  // the play options
+  clockOptions: {
+    // the default speed
+    // caculate method: fpstime * Math.pow(2, speed - 1)
+    // fpstime is the two frame time difference
+    speed: 13,
+    // the max speed
+    maxSpeed: 65
   },
-  {
-    timePosList: [{lat:30, lng:116, time:1502529980, dir:320, heading:300, info:[]}, ....]
+  // trackPoint options
+  trackPointOptions: {
+    // whether draw track point
+    isDraw: false,
+    // whether use canvas to draw it, if false, use leaflet api `L.circleMarker`
+    useCanvas: true,
+    stroke: false,
+    color: '#ef0300',
+    fill: true,
+    fillColor: '#ef0300',
+    opacity: 0.3,
+    radius: 4
   },
-  {
-    timePosList: [{lat:30, lng:116, time:1502529980, dir:320, heading:300, info:[]}, ....]
-  }...
-]
+  // trackLine options
+  trackLineOptions: {
+    // whether draw track line
+    isDraw: false,
+    stroke: true,
+    color: '#1C54E2',
+    weight: 2,
+    fill: false,
+    fillColor: '#000',
+    opacity: 0.3
+  },
+  // target options
+  targetOptions: {
+    // whether use image to display target, if false, the program provide a default
+    useImg: false,
+    // if useImg is true, provide the imgUrl
+    imgUrl: '../../static/images/ship.png',
+    // the width of target, unit: px
+    width: 8,
+    // the height of target, unit: px
+    height: 18,
+    // the stroke color of target, effective when useImg set false
+    color: '#00f',
+    // the fill color of target, effective when useImg set false
+    fillColor: '#9FD12D'
+  }
+}
 
 ```
 
-## Problem
+example:
 
-如果您有好的建议或意见,[欢迎提问](https://github.com/linghuam/TrackPlayback/issues)
+```js
+const trackplayback = L.trackplayback(data, map, options)
+// or
+const trackplayback = new L.TrackPlayBack(data, map, options)
+```
 
+### events
 
-## Recommend
+```js
+// trigger on time change
+trackplayback.on('tick', e => {
+  console.log(e.time)
+}, this)
+```
 
-* [HTML5 Canvas核心技术(书籍)](https://book.douban.com/subject/24533314/)
-* [html5 canvas教程](http://www.w3cplus.com/blog/tags/616.html?page=1)
-* [曲线轨迹动画原理](http://www.tuicool.com/articles/zaeQf22)
-* [WebGIS中使用ZRender实现轨迹前端动态播放特效](http://www.cnblogs.com/naaoveGIS/p/6718822.html)
+### methods
+
+#### trackplayback.start()
+
+start play, return this
+
+#### trackplayback.stop()
+
+stop play, return this
+
+#### trackplayback.rePlaying()
+
+replay, return this
+
+#### trackplayback.slowSpeed()
+
+slow play speed, return this
+
+#### trackplayback.quickSpeed()
+
+quick play speed, return this
+
+#### trackplayback.getSpeed()
+
+get play speed, return speed value
+
+#### trackplayback.getCurTime()
+
+get current time, return unix timestamp
+
+#### trackplayback.getStartTime()
+
+get start time, return unix timestamp
+
+#### trackplayback.getEndTime()
+
+get end time, return unix timestamp
+
+#### trackplayback.isPlaying()
+
+whether in playing, return true or false
+
+#### trackplayback.setCursor(time)
+
+set current playing time, need a unix timestamp param, return this
+
+#### trackplayback.setSpeed(speed)
+
+set the playback speed, return this
+
+#### trackplayback.showTrackPoint()
+
+draw track point, return this
+
+#### trackplayback.hideTrackPoint()
+
+remove track point, return this
+
+#### trackplayback.showTrackLine()
+
+draw track line, return this
+
+#### trackplayback.hideTrackLine()
+
+remove track line, return this
+
+## Issues
+
+If you have good suggestions or comments,[welcome to ask questions](https://github.com/linghuam/TrackPlayback/issues).
+
+## Recommends
+
+* [html5 canvas](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial)
 * [LeafletPlayback](https://github.com/hallahan/LeafletPlayback)
 
 

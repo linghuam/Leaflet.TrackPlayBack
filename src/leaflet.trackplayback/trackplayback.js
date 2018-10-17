@@ -34,9 +34,6 @@ export const TrackPlayBack = L.Evented.extend({
 
     this.clock.on('tick', this._tick, this)
   },
-  addTrack: function () {
-
-  },
   start: function () {
     this.clock.start()
     return this
