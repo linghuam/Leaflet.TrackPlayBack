@@ -54,7 +54,7 @@ export const Track = L.Class.extend({
     let startPt = this.getStartTrackPoint()
     let endPt = this.getEndTrackPoint()
     let times = this.getTimes()
-    if (time < startPt.time || time > endPt.time) return;
+    if (time < startPt.time || time > endPt.time) return
     let left = 0
     let right = times.length - 1
     let n
@@ -62,7 +62,7 @@ export const Track = L.Class.extend({
     if (left === right) {
       return endpoint
     }
-    // 通过二分查找法查出当前时间所在的时间区间
+    // 通过【二分查找】法查出当前时间所在的时间区间
     while (right - left !== 1) {
       n = parseInt((left + right) / 2)
       if (time > times[n]) left = n
@@ -136,7 +136,7 @@ export const Track = L.Class.extend({
     this._updatetimeTick()
   },
 
-  // 轨迹点按时间排序
+  // 轨迹点按时间排序 【冒泡排序】
   _sortTrackPointsByTime: function () {
     let len = this._trackPoints.length
     for (let i = 0; i < len; i++) {

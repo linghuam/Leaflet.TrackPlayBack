@@ -32,9 +32,7 @@ export const TrackPlayBack = L.Evented.extend({
     this.trackController = new TrackController(this.tracks, this.draw)
     this.clock = new Clock(this.trackController, options.clockOptions)
 
-    this.clock.on('tick', e => {
-      this.fire('tick', e)
-    })
+    this.clock.on('tick', this._tick)
   },
   addTrack: function () {
 
@@ -99,7 +97,11 @@ export const TrackPlayBack = L.Evented.extend({
     return this
   },
   dispose: function () {
+    this.clock.off('tick', this._tick)
     this.draw.remove()
+  },
+  _tick: function (e) {
+    this.fire('tick', e)
   },
   _initTracks: function (data) {
     let tracks = []

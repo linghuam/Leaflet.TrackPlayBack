@@ -99,9 +99,11 @@ export const Clock = L.Evented.extend({
     if (this._lastFpsUpdateTime === 0) {
       time = 0
     } else {
-      time = (now - this._lastFpsUpdateTime) / 1000
+      time = now - this._lastFpsUpdateTime
     }
     this._lastFpsUpdateTime = now
+    // 将毫秒转换成秒
+    time = time / 1000
     return time
   },
 

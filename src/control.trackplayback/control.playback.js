@@ -120,7 +120,7 @@ export const TrackPlayBackControl = L.Control.extend({
   },
 
   _createInfo: function (title, info, className, container) {
-    let infoContainer = L.DomUtil.create('div','info-container', container)
+    let infoContainer = L.DomUtil.create('div', 'info-container', container)
     let infoTitle = L.DomUtil.create('span', 'info-title', infoContainer)
     infoTitle.innerHTML = title
     let infoEle = L.DomUtil.create('span', className, infoContainer)

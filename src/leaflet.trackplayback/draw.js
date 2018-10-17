@@ -42,23 +42,40 @@ export const Draw = L.Class.extend({
   },
 
   initialize: function (map, options) {
-    this.trackPointOptions = L.extend(this.trackPointOptions, options.trackPointOptions)
-    this.trackLineOptions = L.extend(this.trackLineOptions, options.trackLineOptions)
-    this.targetOptions = L.extend(this.targetOptions, options.targetOptions)
-    this.toolTipOptions = L.extend(this.toolTipOptions, options.toolTipOptions)
+    L.extend(this.trackPointOptions, options.trackPointOptions)
+    L.extend(this.trackLineOptions, options.trackLineOptions)
+    L.extend(this.targetOptions, options.targetOptions)
+    L.extend(this.toolTipOptions, options.toolTipOptions)
 
-    this._showTrackPoint = this.trackLineOptions.isDraw
+    this._showTrackPoint = this.trackPointOptions.isDraw
     this._showTrackLine = this.trackLineOptions.isDraw
 
     this._map = map
+    this._map.on('mousemove', this._onmousemoveEvt, this)
+
     this._trackLayer = new TrackLayer().addTo(map)
+    this._trackLayer.on('update', this._trackLayerUpdate, this)
+
     this._canvas = this._trackLayer.getContainer()
     this._ctx = this._canvas.getContext('2d')
-    this._bufferTracks = []
-    this._trackPointFeatureGroup = L.featureGroup([]).addTo(map)
 
-    this._trackLayer.on('update', this._trackLayerUpdate, this)
-    this._map.on('mousemove', this._onmousemoveEvt, this)
+    this._bufferTracks = []
+
+    if (!this.trackPointOptions.useCanvas) {
+      this._trackPointFeatureGroup = L.featureGroup([]).addTo(map)
+    }
+
+    // 目标如果使用图片，先加载图片
+    if (this.targetOptions.useImg) {
+      const img = new Image()
+      img.onload = () => {
+        this._targetImg = img
+      }
+      img.onerror = () => {
+        throw new Error('img load error!')
+      }
+      img.src = this.targetOptions.imgUrl
+    }
   },
 
   update: function () {
@@ -111,7 +128,7 @@ export const Draw = L.Class.extend({
     if (this._bufferTracks.length) {
       this._clearLayer()
       this._bufferTracks.forEach(function (element, index) {
-        this._drawTrack(element, false)
+        this._drawTrack(element)
       }.bind(this))
     }
   },
@@ -124,7 +141,7 @@ export const Draw = L.Class.extend({
     if (this._bufferTracks.length) {
       for (let i = 0, leni = this._bufferTracks.length; i < leni; i++) {
         for (let j = 0, len = this._bufferTracks[i].length; j < len; j++) {
-          let tpoint = this._map.latLngToLayerPoint(L.latLng(this._bufferTracks[i][j].lat, this._bufferTracks[i][j].lng))
+          let tpoint = this._getLayerPoint(this._bufferTracks[i][j])
           if (point.distanceTo(tpoint) <= this.trackPointOptions.radius) {
             this._opentoolTip(this._bufferTracks[i][j])
             return
@@ -156,10 +173,11 @@ export const Draw = L.Class.extend({
       this._drawTrackLine(trackpoints)
     }
     // 画船
-    if (this.targetOptions.useImg) {
-      this._drawShipImage(trackpoints[trackpoints.length - 1])
+    let targetPoint = trackpoints[trackpoints.length - 1]
+    if (this.targetOptions.useImg && this._targetImg) {
+      this._drawShipImage(targetPoint)
     } else {
-      this._drawShipCanvas(trackpoints[trackpoints.length - 1])
+      this._drawShipCanvas(targetPoint)
     }
     // 画经过的轨迹点
     if (this._showTrackPoint) {
@@ -173,13 +191,13 @@ export const Draw = L.Class.extend({
 
   _drawTrackLine: function (trackpoints) {
     let options = this.trackLineOptions
-    let tp0 = this._map.latLngToLayerPoint(L.latLng(trackpoints[0].lat, trackpoints[0].lng))
+    let tp0 = this._getLayerPoint(trackpoints[0])
     this._ctx.save()
     this._ctx.beginPath()
     // 画轨迹线
     this._ctx.moveTo(tp0.x, tp0.y)
     for (let i = 1, len = trackpoints.length; i < len; i++) {
-      let tpi = this._map.latLngToLayerPoint(L.latLng(trackpoints[i].lat, trackpoints[i].lng))
+      let tpi = this._getLayerPoint(trackpoints[i])
       this._ctx.lineTo(tpi.x, tpi.y)
     }
     this._ctx.globalAlpha = options.opacity
@@ -231,7 +249,7 @@ export const Draw = L.Class.extend({
   },
 
   _drawShipCanvas: function (trackpoint) {
-    let point = this._map.latLngToLayerPoint(L.latLng(trackpoint.lat, trackpoint.lng))
+    let point = this._getLayerPoint(trackpoint)
     let rotate = trackpoint.dir || 0
     let w = this.targetOptions.width
     let h = this.targetOptions.height
@@ -255,7 +273,7 @@ export const Draw = L.Class.extend({
   },
 
   _drawShipImage: function (trackpoint) {
-    let point = this._map.latLngToLayerPoint(L.latLng(trackpoint.lat, trackpoint.lng))
+    let point = this._getLayerPoint(trackpoint)
     let dir = trackpoint.dir || 0
     let width = this.targetOptions.width
     let height = this.targetOptions.height
@@ -263,15 +281,11 @@ export const Draw = L.Class.extend({
       x: width / 2,
       y: height / 2
     }
-    let img = new window.Image()
-    img.onload = function () {
-      this._ctx.save()
-      this._ctx.translate(point.x, point.y)
-      this._ctx.rotate((Math.PI / 180) * dir)
-      this._ctx.drawImage(img, 0 - offset.x, 0 - offset.y, width, height)
-      this._ctx.restore()
-    }.bind(this)
-    img.src = this.targetOptions.imgUrl
+    this._ctx.save()
+    this._ctx.translate(point.x, point.y)
+    this._ctx.rotate((Math.PI / 180) * dir)
+    this._ctx.drawImage(this._targetImg, 0 - offset.x, 0 - offset.y, width, height)
+    this._ctx.restore()
   },
 
   _getTooltipText: function (targetobj) {
@@ -301,6 +315,10 @@ export const Draw = L.Class.extend({
     if (this._map.hasLayer(this._trackPointFeatureGroup)) {
       this._trackPointFeatureGroup.clearLayers()
     }
+  },
+
+  _getLayerPoint (trackpoint) {
+    return this._map.latLngToLayerPoint(L.latLng(trackpoint.lat, trackpoint.lng))
   }
 })
 

@@ -20,14 +20,20 @@
     xhr.open('GET', './data/test.json', false);
     xhr.send(null);
     const data = JSON.parse(xhr.responseText);
-    const map = L.map('mapid').setView([33.74,  134.38], 6);
+    const map = L.map('mapid').setView([33.74, 134.38], 6);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    const trackplayback = L.trackplayback(data, map);
+    const trackplayback = L.trackplayback(data, map, {
+      targetOptions: {
+        useImg: true,
+        imgUrl: './ship.png'
+      }
+    });
     const trackplaybackControl = L.trackplaybackcontrol(trackplayback);
     trackplaybackControl.addTo(map);
+
   </script>
 </body>
 
