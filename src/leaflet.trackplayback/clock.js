@@ -1,7 +1,9 @@
 /**
  * 时钟类，控制轨迹播放动画
  */
-export const Clock = L.Evented.extend({
+export const Clock = L.Class.extend({
+
+  includes: L.Mixin.Events,
 
   options: {
     // 播放速度

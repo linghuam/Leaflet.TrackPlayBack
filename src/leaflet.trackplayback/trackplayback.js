@@ -19,7 +19,10 @@ import * as Util from './util'
  * mutiple track data
  * [single track data, single track data, single track data]
  */
-export const TrackPlayBack = L.Evented.extend({
+export const TrackPlayBack = L.Class.extend({
+
+  includes: L.Mixin.Events,
+
   initialize: function (data, map, options = {}) {
     let drawOptions = {
       trackPointOptions: options.trackPointOptions,

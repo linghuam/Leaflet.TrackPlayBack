@@ -2,13 +2,15 @@
 
 ## Introduce
 
-It's a track playback plugin based on leaflet and HTML5 canvas. To use it,you need provide some GPS data and time data, then you can play the track on the map.
+It's a track playback plugin based on leaflet and HTML5 canvas.
+
+To use it,you need provide some GPS data and time data, then you can play the track on the map.
 
 Support track playback, pause, fast forward, fast reverse operation.
 
 ## Requirements
 
-- leaflet version: >=0.7
+- leaflet version: >1.0.0
 
 ## Demo
 
