@@ -2,7 +2,7 @@
   "name": "leaflet-plugin-trackplayback",
   "version": "1.0.0",
   "description": "track playback plugin based on leaflet",
-  "main": "index.js",
+  "main": "dist/leaflet.trackplayback.js",
   "directories": {
     "example": "examples",
     "lib": "lib"
