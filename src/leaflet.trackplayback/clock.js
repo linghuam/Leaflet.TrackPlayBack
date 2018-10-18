@@ -6,7 +6,7 @@ export const Clock = L.Evented.extend({
   options: {
     // 播放速度
     // 计算方法 fpstime * Math.pow(2, this._speed - 1)
-    speed: 13,
+    speed: 12,
     // 最大播放速度
     maxSpeed: 65
   },
