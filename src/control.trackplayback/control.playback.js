@@ -1,3 +1,5 @@
+import L from 'leaflet'
+
 export const TrackPlayBackControl = L.Control.extend({
 
   options: {

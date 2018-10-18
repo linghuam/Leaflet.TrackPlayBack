@@ -1,3 +1,4 @@
+import L from 'leaflet'
 /**
  * 时钟类，控制轨迹播放动画
  */

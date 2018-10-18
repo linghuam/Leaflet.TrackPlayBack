@@ -6,12 +6,20 @@ module.exports = {
     devtool: 'source-map',
     entry: {
         'control.trackplayback': './src/control.trackplayback/index.js',
-        'leaflet.trackplayback': ['./src/leaflet.trackplayback/index.js']
+        'leaflet.trackplayback': './src/leaflet.trackplayback/index.js'
+    },
+    externals: {
+        leaflet: {
+            root: 'L',
+            commonjs: 'leaflet',
+            commonjs2: 'leaflet',
+            amd: 'leaflet'
+        }
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
-        // filename: '[name].js',
-        // libraryTarget : 'umd'
+        filename: '[name].js',
+        libraryTarget : 'umd'
     },
     plugins: [
         new CopyWebpackPlugin([{
@@ -19,6 +27,5 @@ module.exports = {
             to: path.resolve(__dirname, 'dist'),
             ignore: ['*.js']
         }])
-    ],
-    target: 'web'
+    ]
 }

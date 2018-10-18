@@ -24,6 +24,15 @@ Using npm:
 npm i leaflet-plugin-trackplayback
 ```
 
+```js
+import L from 'leaflet'
+import 'leaflet-plugin-trackplayback'
+
+const trackplayback = L.trackplayback(data, map);
+// or
+const trackplayback = new L.TrackPlayBack(data, map);
+```
+
 Using script tag:
 
 ```html
@@ -53,7 +62,7 @@ example:
 
 when you want to play back one track
 
-```
+```js
 [{lat:30, lng:116, time:1502529980, dir:320, info:[{key: 'name', value: 'ship1'}]}, ....]
 ```
 
@@ -61,7 +70,7 @@ or
 
 when you want to play back more tracks
 
-```
+```js
 [[{lat:30, lng:116, time:1502529980, dir:320, info:[]}, ....], [{lat:30, lng:116, time:1502529980, dir:320, info:[]}, ....]]
 ```
 
@@ -73,9 +82,7 @@ the trackpoint obj properties:
 - dir(Optional): Moving direction(0-360 degrees, Clockwise direction), if you don't provide it, the program can auto caculate the target direction
 - info(Optional): other static information of the target, it's an array of key-value pairs
 
-
 `map` is the L.map instance.
-
 
 `options` can be:
 
@@ -218,9 +225,8 @@ If you have good suggestions or comments,[welcome to ask questions](https://gith
 
 ## Recommends
 
-* [html5 canvas](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial)
-* [LeafletPlayback](https://github.com/hallahan/LeafletPlayback)
-
+1. [html5 canvas](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial)
+2. [LeafletPlayback](https://github.com/hallahan/LeafletPlayback)
 
 ## License
 

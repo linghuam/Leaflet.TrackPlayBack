@@ -1,3 +1,5 @@
+import L from 'leaflet'
+
 import {
   Track
 } from './track'

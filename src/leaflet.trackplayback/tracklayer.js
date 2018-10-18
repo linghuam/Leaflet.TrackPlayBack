@@ -1,3 +1,5 @@
+import L from 'leaflet'
+
 /**
  * 轨迹图层
  */

@@ -1,3 +1,5 @@
+import L from 'leaflet'
+
 import {
   TrackLayer
 } from './tracklayer'
