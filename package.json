@@ -1,6 +1,6 @@
 {
   "name": "leaflet-plugin-trackplayback",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "track playback plugin based on leaflet",
   "main": "dist/leaflet.trackplayback.js",
   "directories": {
@@ -10,7 +10,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --ext .js src --fix",
-    "build": "webpack --config webpack.config.js"
+    "webpack": "webpack --config webpack.config.js",
+    "build": "npm run lint && npm run webpack"
   },
   "repository": {
     "type": "git",

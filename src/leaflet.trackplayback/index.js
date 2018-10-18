@@ -3,10 +3,5 @@ import {
   trackplayback
 } from './trackplayback'
 
-export {
-  TrackPlayBack,
-  trackplayback
-}
-
-window.L.TrackPlayBack = TrackPlayBack
-window.L.trackplayback = trackplayback
+L.TrackPlayBack = TrackPlayBack
+L.trackplayback = trackplayback
