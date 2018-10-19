@@ -25,6 +25,8 @@ npm i leaflet
 npm i leaflet-plugin-trackplayback
 ```
 
+example:
+
 ```js
 import L from 'leaflet'
 import 'leaflet-plugin-trackplayback'
