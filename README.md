@@ -21,6 +21,7 @@ Support track playback, pause, fast forward, fast reverse operation.
 Using npm:
 
 ```shell
+npm i leaflet
 npm i leaflet-plugin-trackplayback
 ```
 
@@ -56,7 +57,7 @@ example:
 
 ## API reference
 
-### constructor(data, map, options)
+### initialize(data, map, options)
 
 `data` can be:
 
