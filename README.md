@@ -40,11 +40,15 @@ Using script tag:
 
 ```html
   <link rel="stylesheet" href="./lib/leaflet/leaflet.css">
+
   <!--Optional (only if you need plaback control)-->
   <link rel="stylesheet" href="../dist/control.playback.css">
+
   <script src="./lib/leaflet/leaflet.js"></script>
+
   <!--Optional (only if you need plaback control)-->
   <script src="../dist/control.trackplayback.js"></script>
+
   <script src="../dist/leaflet.trackplayback.js"></script>
 ```
 
@@ -52,8 +56,10 @@ example:
 
 ```js
     const trackplayback = L.trackplayback(data, map);
+
     // Optional  (only if you need plaback control)
     const trackplaybackControl = L.trackplaybackcontrol(trackplayback);
+
     trackplaybackControl.addTo(map);
 ```
 
@@ -154,71 +160,71 @@ trackplayback.on('tick', e => {
 
 ### methods
 
-#### start()
+#### # start()
 
 start play, return this
 
-#### stop()
+#### # stop()
 
 stop play, return this
 
-#### rePlaying()
+#### # rePlaying()
 
 replay, return this
 
-#### slowSpeed()
+#### # slowSpeed()
 
 slow play speed, return this
 
-#### quickSpeed()
+#### # quickSpeed()
 
 quick play speed, return this
 
-#### getSpeed()
+#### # getSpeed()
 
 get play speed, return speed value
 
-#### getCurTime()
+#### # getCurTime()
 
 get current time, return unix timestamp
 
-#### getStartTime()
+#### # getStartTime()
 
 get start time, return unix timestamp
 
-#### getEndTime()
+#### # getEndTime()
 
 get end time, return unix timestamp
 
-#### isPlaying()
+#### # isPlaying()
 
 whether in playing, return true or false
 
-#### setCursor(time)
+#### # setCursor(time)
 
 set current playing time, need a unix timestamp param, return this
 
-#### setSpeed(speed)
+#### # setSpeed(speed)
 
 set the playback speed, return this
 
-#### showTrackPoint()
+#### # showTrackPoint()
 
 draw track point, return this
 
-#### hideTrackPoint()
+#### # hideTrackPoint()
 
 remove track point, return this
 
-#### showTrackLine()
+#### # showTrackLine()
 
 draw track line, return this
 
-#### hideTrackLine()
+#### # hideTrackLine()
 
 remove track line, return this
 
-#### dispose()
+#### # dispose()
 
 destory the trackplayback instance, when call this, the trackplayback instance can't be used again and the program will clear track layer.
 
