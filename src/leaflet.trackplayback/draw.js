@@ -32,6 +32,7 @@ export const Draw = L.Class.extend({
   targetOptions: {
     useImg: false,
     imgUrl: '../../static/images/ship.png',
+    showText: false,
     width: 8,
     height: 18,
     color: '#00f', // stroke color
@@ -181,6 +182,10 @@ export const Draw = L.Class.extend({
     } else {
       this._drawShipCanvas(targetPoint)
     }
+    // 画标注信息
+    if (this.targetOptions.showText) {
+      this._drawtxt(`航向：${parseInt(targetPoint.dir)}度`, targetPoint)
+    }
     // 画经过的轨迹点
     if (this._showTrackPoint) {
       if (this.trackPointOptions.useCanvas) {
@@ -248,6 +253,17 @@ export const Draw = L.Class.extend({
         this._trackPointFeatureGroup.addLayer(cricleMarker)
       }
     }
+  },
+
+  _drawtxt: function (text, trackpoint) {
+    let point = this._getLayerPoint(trackpoint)
+    this._ctx.save()
+    this._ctx.font = '12px Verdana'
+    this._ctx.fillStyle = '#000'
+    this._ctx.textAlign = 'center'
+    this._ctx.textBaseline = 'bottom'
+    this._ctx.fillText(text, point.x, point.y - 12, 200)
+    this._ctx.restore()
   },
 
   _drawShipCanvas: function (trackpoint) {
