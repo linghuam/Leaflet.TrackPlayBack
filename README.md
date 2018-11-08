@@ -228,6 +228,12 @@ remove track line, return this
 
 destory the trackplayback instance, when call this, the trackplayback instance can't be used again and the program will clear track layer.
 
+## performance
+
+I collected the frame rate for a while.
+
+![Frame rate](examples/playback.png)
+
 ## Issues
 
 If you have good suggestions or comments,[welcome to ask questions](https://github.com/linghuam/TrackPlayback/issues).
