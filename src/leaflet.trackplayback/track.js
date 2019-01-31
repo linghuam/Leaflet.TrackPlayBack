@@ -94,7 +94,7 @@ export const Track = L.Class.extend({
     let y = startPt.y + step * sinx
     // 求目标的运动方向，0-360度
     let dir = endPt.x >= startPt.x ? (Math.PI * 0.5 - Math.asin(sinx)) * 180 / Math.PI : (Math.PI * 1.5 + Math.asin(sinx)) * 180 / Math.PI
-
+      
     if (endpoint) {
       if (endpoint.dir === undefined) {
         endpoint.dir = dir
@@ -103,7 +103,7 @@ export const Track = L.Class.extend({
       endpoint = {
         lng: x,
         lat: y,
-        dir: dir,
+        dir: endPt.dir || dir,
         isOrigin: false,
         time: time
       }
