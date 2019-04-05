@@ -7,7 +7,8 @@ export const TrackPlayBackControl = L.Control.extend({
     showOptions: true,
     showInfo: true,
     showSlider: true,
-    autoPlay: false
+    autoPlay: false,
+    showClose: true
   },
 
   initialize: function (trackplayback, options) {
@@ -100,7 +101,10 @@ export const TrackPlayBackControl = L.Control.extend({
     this._restartBtn = this._createButton(this._text.replay, 'btn-restart', this._buttonContainer, this._restart)
     this._slowSpeedBtn = this._createButton(this._text.slow, 'btn-slow', this._buttonContainer, this._slow)
     this._quickSpeedBtn = this._createButton(this._text.quick, 'btn-quick', this._buttonContainer, this._quick)
-    this._closeBtn = this._createButton(this._text.close, 'btn-close', this._buttonContainer, this._close)
+
+    if (this.options.showClose) {
+      this._closeBtn = this._createButton(this._text.close, 'btn-close', this._buttonContainer, this._close)
+    }
 
     this._infoStartTime = this._createInfo(this._text.startTime + ': ', this.getTimeStrFromUnix(this.trackPlayBack.getStartTime()), 'info-start-time', this._infoContainer)
     this._infoEndTime = this._createInfo(this._text.endTime + ': ', this.getTimeStrFromUnix(this.trackPlayBack.getEndTime()), 'info-end-time', this._infoContainer)
