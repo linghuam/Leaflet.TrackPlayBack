@@ -83,6 +83,7 @@ export const TrackPlayBackControl = L.Control.extend({
       close: 'close',
       startTime: 'startTime',
       endTime: 'endTime',
+      minutes: 'minutes',
       curTime: 'curTime',
       speed: 'speed'
     },
@@ -97,6 +98,7 @@ export const TrackPlayBackControl = L.Control.extend({
       close: 'schlie\u00DFen',
       startTime: 'Beginn',
       endTime: 'Ende',
+      minutes: 'Minuten',
       curTime: 'Zeitpunkt',
       speed: 'Geschwindigkeit'
     }
@@ -127,6 +129,7 @@ export const TrackPlayBackControl = L.Control.extend({
     this._slider = this._createSlider('time-slider', this._sliderContainer, this._scrollchange)
 
     this._infoSpeedRatio = this._createInfo(this._text[this.options.language].speed + ': ', `X${this.trackPlayBack.getSpeed()}`, 'info-speed-ratio', this._infoContainer)
+    this._infoMinutes = this._createInfo(this._text[this.options.language].minutes + ': ', Math.round(((new Date(1000.0 * this.trackPlayBack.getEndTime())) - (new Date(1000.0 * this.trackPlayBack.getStartTime()))) / 1000.0 / 60.0), 'info-minutes', this._infoContainer)
     this._infoStartTime = this._createInfo(this._text[this.options.language].startTime + ': ', this.getTimeStrFromUnix(this.trackPlayBack.getStartTime()), 'info-start-time', this._infoContainer)
     this._infoEndTime = this._createInfo(this._text[this.options.language].endTime + ': ', this.getTimeStrFromUnix(this.trackPlayBack.getEndTime()), 'info-end-time', this._infoContainer)
     this._infoCurTime = this._createInfo(this._text[this.options.language].curTime + ': ', this.getTimeStrFromUnix(this.trackPlayBack.getCurTime()), 'info-cur-time', this._infoContainer)
