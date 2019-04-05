@@ -194,6 +194,13 @@ export const TrackPlayBackControl = L.Control.extend({
     }
   },
 
+  _stop: function () {
+    L.DomUtil.removeClass(this._playBtn, 'btn-start')
+    L.DomUtil.addClass(this._playBtn, 'btn-stop')
+    this._playBtn.setAttribute('title', this._text.play)
+    this.trackPlayBack.stop()
+  },
+
   _play: function () {
     let hasClass = L.DomUtil.hasClass(this._playBtn, 'btn-stop')
     if (hasClass) {
@@ -202,10 +209,7 @@ export const TrackPlayBackControl = L.Control.extend({
       this._playBtn.setAttribute('title', this._text.stop)
       this.trackPlayBack.start()
     } else {
-      L.DomUtil.removeClass(this._playBtn, 'btn-start')
-      L.DomUtil.addClass(this._playBtn, 'btn-stop')
-      this._playBtn.setAttribute('title', this._text.play)
-      this.trackPlayBack.stop()
+      this._stop()
     }
   },
 
@@ -250,10 +254,7 @@ export const TrackPlayBackControl = L.Control.extend({
     this._slider.value = e.time
     // 播放结束后改变播放按钮样式
     if (e.time >= this.trackPlayBack.getEndTime()) {
-      L.DomUtil.removeClass(this._playBtn, 'btn-start')
-      L.DomUtil.addClass(this._playBtn, 'btn-stop')
-      this._playBtn.setAttribute('title', this._text.play)
-      this.trackPlayBack.stop()
+      this._stop()
     }
   }
 })
