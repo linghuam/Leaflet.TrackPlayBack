@@ -8,7 +8,8 @@ export const TrackPlayBackControl = L.Control.extend({
     showInfo: true,
     showSlider: true,
     autoPlay: false,
-    showClose: true
+    showClose: true,
+    language: 'en' // 'de'
   },
 
   initialize: function (trackplayback, options) {
@@ -56,34 +57,36 @@ export const TrackPlayBackControl = L.Control.extend({
     return ret
   },
 
-  _text: { // English.
-    showTrackPoint: 'show trackPoint',
-    showTrackLine: 'show trackLine',
-    play: 'play',
-    stop: 'stop',
-    replay: 'replay',
-    slow: 'slow',
-    quick: 'quick',
-    close: 'close',
-    startTime: 'startTime',
-    endTime: 'endTime',
-    curTime: 'curTime',
-    speed: 'speed'
+  _text: {
+    en: { // English.
+      showTackPoint: 'show trackPoint',
+      showTrackLine: 'show trackLine',
+      play: 'play',
+      stop: 'stop',
+      replay: 'replay',
+      slow: 'slow',
+      quick: 'quick',
+      close: 'close',
+      startTime: 'startTime',
+      endTime: 'endTime',
+      curTime: 'curTime',
+      speed: 'speed'
+    },
+    de: { // German.
+      showTrackPoint: 'Punkte anzeigen',
+      showTrackLine: 'Linie(-n) anzeigen',
+      play: 'Wiedergabe',
+      stop: 'Pause',
+      replay: 'wiederholen',
+      slow: 'langsamer',
+      quick: 'schneller',
+      close: 'schlie\u00DFen',
+      startTime: 'Beginn',
+      endTime: 'Ende',
+      curTime: 'Zeitpunkt',
+      speed: 'Geschwindigkeit'
+    }
   },
-  // _text: { // German.
-  //   showTrackPoint: 'Punkte anzeigen',
-  //   showTrackLine: 'Linie(-n) anzeigen',
-  //   play: 'Wiedergabe',
-  //   stop: 'Pause',
-  //   replay: 'wiederholen',
-  //   slow: 'langsamer',
-  //   quick: 'schneller',
-  //   close: 'schlie\u00DFen',
-  //   startTime: 'Beginn',
-  //   endTime: 'Ende',
-  //   curTime: 'Zeitpunkt',
-  //   speed: 'Geschwindigkeit'
-  // },
 
   _initContainer: function () {
     var className = 'leaflet-control-playback'
@@ -95,22 +98,22 @@ export const TrackPlayBackControl = L.Control.extend({
     this._infoContainer = this._createContainer('infoContainer', this._container)
     this._sliderContainer = this._createContainer('sliderContainer', this._container)
 
-    this._pointCbx = this._createCheckbox(this._text.showTrackPoint, 'show-trackpoint', this._optionsContainer, this._showTrackPoint)
-    this._lineCbx = this._createCheckbox(this._text.showTrackLine, 'show-trackLine', this._optionsContainer, this._showTrackLine)
+    this._pointCbx = this._createCheckbox(this._text[this.options.language].showTrackPoint, 'show-trackpoint', this._optionsContainer, this._showTrackPoint)
+    this._lineCbx = this._createCheckbox(this._text[this.options.language].showTrackLine, 'show-trackLine', this._optionsContainer, this._showTrackLine)
 
-    this._playBtn = this._createButton(this._text.play, 'btn-stop', this._buttonContainer, this._play)
-    this._restartBtn = this._createButton(this._text.replay, 'btn-restart', this._buttonContainer, this._restart)
-    this._slowSpeedBtn = this._createButton(this._text.slow, 'btn-slow', this._buttonContainer, this._slow)
-    this._quickSpeedBtn = this._createButton(this._text.quick, 'btn-quick', this._buttonContainer, this._quick)
+    this._playBtn = this._createButton(this._text[this.options.language].play, 'btn-stop', this._buttonContainer, this._play)
+    this._restartBtn = this._createButton(this._text[this.options.language].replay, 'btn-restart', this._buttonContainer, this._restart)
+    this._slowSpeedBtn = this._createButton(this._text[this.options.language].slow, 'btn-slow', this._buttonContainer, this._slow)
+    this._quickSpeedBtn = this._createButton(this._text[this.options.language].quick, 'btn-quick', this._buttonContainer, this._quick)
 
     if (this.options.showClose) {
-      this._closeBtn = this._createButton(this._text.close, 'btn-close', this._buttonContainer, this._close)
+      this._closeBtn = this._createButton(this._text[this.options.language].close, 'btn-close', this._buttonContainer, this._close)
     }
 
-    this._infoStartTime = this._createInfo(this._text.startTime + ': ', this.getTimeStrFromUnix(this.trackPlayBack.getStartTime()), 'info-start-time', this._infoContainer)
-    this._infoEndTime = this._createInfo(this._text.endTime + ': ', this.getTimeStrFromUnix(this.trackPlayBack.getEndTime()), 'info-end-time', this._infoContainer)
-    this._infoCurTime = this._createInfo(this._text.curTime + ': ', this.getTimeStrFromUnix(this.trackPlayBack.getCurTime()), 'info-cur-time', this._infoContainer)
-    this._infoSpeedRatio = this._createInfo(this._text.speed + ': ', `X${this.trackPlayBack.getSpeed()}`, 'info-speed-ratio', this._infoContainer)
+    this._infoStartTime = this._createInfo(this._text[this.options.language].startTime + ': ', this.getTimeStrFromUnix(this.trackPlayBack.getStartTime()), 'info-start-time', this._infoContainer)
+    this._infoEndTime = this._createInfo(this._text[this.options.language].endTime + ': ', this.getTimeStrFromUnix(this.trackPlayBack.getEndTime()), 'info-end-time', this._infoContainer)
+    this._infoCurTime = this._createInfo(this._text[this.options.language].curTime + ': ', this.getTimeStrFromUnix(this.trackPlayBack.getCurTime()), 'info-cur-time', this._infoContainer)
+    this._infoSpeedRatio = this._createInfo(this._text[this.options.language].speed + ': ', `X${this.trackPlayBack.getSpeed()}`, 'info-speed-ratio', this._infoContainer)
 
     this._slider = this._createSlider('time-slider', this._sliderContainer, this._scrollchange)
 
@@ -198,7 +201,7 @@ export const TrackPlayBackControl = L.Control.extend({
   _stop: function () {
     L.DomUtil.removeClass(this._playBtn, 'btn-start')
     L.DomUtil.addClass(this._playBtn, 'btn-stop')
-    this._playBtn.setAttribute('title', this._text.play)
+    this._playBtn.setAttribute('title', this._text[this.options.language].play)
     this.trackPlayBack.stop()
   },
 
@@ -207,7 +210,7 @@ export const TrackPlayBackControl = L.Control.extend({
     if (hasClass) {
       L.DomUtil.removeClass(this._playBtn, 'btn-stop')
       L.DomUtil.addClass(this._playBtn, 'btn-start')
-      this._playBtn.setAttribute('title', this._text.stop)
+      this._playBtn.setAttribute('title', this._text[this.options.language].stop)
       this.trackPlayBack.start()
     } else {
       this._stop()
@@ -218,7 +221,7 @@ export const TrackPlayBackControl = L.Control.extend({
     // 播放开始改变播放按钮样式
     L.DomUtil.removeClass(this._playBtn, 'btn-stop')
     L.DomUtil.addClass(this._playBtn, 'btn-start')
-    this._playBtn.setAttribute('title', this._text.stop)
+    this._playBtn.setAttribute('title', this._text[this.options.language].stop)
     this.trackPlayBack.rePlaying()
   },
 
