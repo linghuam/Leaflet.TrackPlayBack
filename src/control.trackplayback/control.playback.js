@@ -23,6 +23,7 @@ export const TrackPlayBackControl = L.Control.extend({
   },
 
   onRemove: function (map) {
+    this.trackPlayBack.stop()
     this.trackPlayBack.dispose()
     this.trackPlayBack.off('tick', this._tickCallback, this)
   },
