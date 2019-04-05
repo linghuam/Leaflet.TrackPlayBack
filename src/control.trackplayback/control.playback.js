@@ -104,6 +104,10 @@ export const TrackPlayBackControl = L.Control.extend({
     }
   },
 
+  _getUiSpeed: function () {
+    return Math.pow(2, this.trackPlayBack.getSpeed() - 1)
+  },
+
   _initContainer: function () {
     var className = 'leaflet-control-playback'
     this._container = L.DomUtil.create('div', className)
@@ -128,7 +132,7 @@ export const TrackPlayBackControl = L.Control.extend({
 
     this._slider = this._createSlider('time-slider', this._sliderContainer, this._scrollchange)
 
-    this._infoSpeedRatio = this._createInfo(this._text[this.options.language].speed + ': ', `X${this.trackPlayBack.getSpeed()}`, 'info-speed-ratio', this._infoContainer)
+    this._infoSpeedRatio = this._createInfo(this._text[this.options.language].speed + ': ', this._getUiSpeed() + 'x', 'info-speed-ratio', this._infoContainer)
     this._infoMinutes = this._createInfo(this._text[this.options.language].minutes + ': ', Math.round(((new Date(1000.0 * this.trackPlayBack.getEndTime())) - (new Date(1000.0 * this.trackPlayBack.getStartTime()))) / 1000.0 / 60.0), 'info-minutes', this._infoContainer)
     this._infoStartTime = this._createInfo(this._text[this.options.language].startTime + ': ', this.getTimeStrFromUnix(this.trackPlayBack.getStartTime()), 'info-start-time', this._infoContainer)
     this._infoEndTime = this._createInfo(this._text[this.options.language].endTime + ': ', this.getTimeStrFromUnix(this.trackPlayBack.getEndTime()), 'info-end-time', this._infoContainer)
@@ -244,14 +248,12 @@ export const TrackPlayBackControl = L.Control.extend({
 
   _slow: function () {
     this.trackPlayBack.slowSpeed()
-    let sp = this.trackPlayBack.getSpeed()
-    this._infoSpeedRatio.innerHTML = `X${sp}`
+    this._infoSpeedRatio.innerHTML = this._getUiSpeed() + 'x'
   },
 
   _quick: function () {
     this.trackPlayBack.quickSpeed()
-    let sp = this.trackPlayBack.getSpeed()
-    this._infoSpeedRatio.innerHTML = `X${sp}`
+    this._infoSpeedRatio.innerHTML = this._getUiSpeed() + 'x'
   },
 
   _close: function () {
