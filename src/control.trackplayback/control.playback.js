@@ -109,8 +109,8 @@ export const TrackPlayBackControl = L.Control.extend({
 
     this._optionsContainer = this._createContainer('optionsContainer', this._container)
     this._buttonContainer = this._createContainer('buttonContainer', this._container)
-    this._infoContainer = this._createContainer('infoContainer', this._container)
     this._sliderContainer = this._createContainer('sliderContainer', this._container)
+    this._infoContainer = this._createContainer('infoContainer', this._container)
 
     this._pointCbx = this._createCheckbox(this._text[this.options.language].showTrackPoint, 'show-trackpoint', this._optionsContainer, this._showTrackPoint)
     this._lineCbx = this._createCheckbox(this._text[this.options.language].showTrackLine, 'show-trackLine', this._optionsContainer, this._showTrackLine)
@@ -124,12 +124,12 @@ export const TrackPlayBackControl = L.Control.extend({
       this._closeBtn = this._createButton(this._text[this.options.language].close, 'btn-close', this._buttonContainer, this._close)
     }
 
+    this._slider = this._createSlider('time-slider', this._sliderContainer, this._scrollchange)
+
+    this._infoSpeedRatio = this._createInfo(this._text[this.options.language].speed + ': ', `X${this.trackPlayBack.getSpeed()}`, 'info-speed-ratio', this._infoContainer)
     this._infoStartTime = this._createInfo(this._text[this.options.language].startTime + ': ', this.getTimeStrFromUnix(this.trackPlayBack.getStartTime()), 'info-start-time', this._infoContainer)
     this._infoEndTime = this._createInfo(this._text[this.options.language].endTime + ': ', this.getTimeStrFromUnix(this.trackPlayBack.getEndTime()), 'info-end-time', this._infoContainer)
     this._infoCurTime = this._createInfo(this._text[this.options.language].curTime + ': ', this.getTimeStrFromUnix(this.trackPlayBack.getCurTime()), 'info-cur-time', this._infoContainer)
-    this._infoSpeedRatio = this._createInfo(this._text[this.options.language].speed + ': ', `X${this.trackPlayBack.getSpeed()}`, 'info-speed-ratio', this._infoContainer)
-
-    this._slider = this._createSlider('time-slider', this._sliderContainer, this._scrollchange)
 
     return this._container
   },
