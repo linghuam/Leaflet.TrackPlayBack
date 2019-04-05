@@ -45,15 +45,29 @@ export const TrackPlayBackControl = L.Control.extend({
     let minuts = newDate.getMinutes() < 10 ? '0' + newDate.getMinutes() : newDate.getMinutes()
     let seconds = newDate.getSeconds() < 10 ? '0' + newDate.getSeconds() : newDate.getSeconds()
     let ret
-    if (accuracy === 'd') {
-      ret = year + '-' + month + '-' + day
-    } else if (accuracy === 'h') {
-      ret = year + '-' + month + '-' + day + ' ' + hours
-    } else if (accuracy === 'm') {
-      ret = year + '-' + month + '-' + day + ' ' + hours + ':' + minuts
-    } else {
-      ret = year + '-' + month + '-' + day + ' ' + hours + ':' + minuts + ':' + seconds
+
+    if (this.options.language === 'de') { // German.
+      if (accuracy === 'd') {
+        ret = day + '.' + month + '.' + year
+      } else if (accuracy === 'h') {
+        ret = day + '.' + month + '.' + year + ' ' + hours
+      } else if (accuracy === 'm') {
+        ret = day + '.' + month + '.' + year + ' ' + hours + ':' + minuts
+      } else {
+        ret = day + '.' + month + '.' + year + ' ' + hours + ':' + minuts + ':' + seconds
+      }
+    } else { // English.
+      if (accuracy === 'd') {
+        ret = year + '-' + month + '-' + day
+      } else if (accuracy === 'h') {
+        ret = year + '-' + month + '-' + day + ' ' + hours
+      } else if (accuracy === 'm') {
+        ret = year + '-' + month + '-' + day + ' ' + hours + ':' + minuts
+      } else {
+        ret = year + '-' + month + '-' + day + ' ' + hours + ':' + minuts + ':' + seconds
+      }
     }
+
     return ret
   },
 
