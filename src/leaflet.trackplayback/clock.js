@@ -11,7 +11,7 @@ export const Clock = L.Class.extend({
     // 计算方法 fpstime * Math.pow(2, this._speed - 1)
     speed: 12,
     // 最大播放速度
-    maxSpeed: 65
+    maxSpeed: 16 // Math.pow(2, 16 - 1) = 32768
   },
 
   initialize: function (trackController, options) {

@@ -243,6 +243,10 @@ If you have good suggestions or comments,[welcome to ask questions](https://gith
 1. [html5 canvas](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial)
 2. [LeafletPlayback](https://github.com/hallahan/LeafletPlayback)
 
+## 3rd party stuff
+
+Uses Koloria Icons Pack by Andy Gongea: http://graphicrating.com
+
 ## License
 
 [MIT license](https://opensource.org/licenses/mit-license.php)
