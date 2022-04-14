@@ -23,7 +23,7 @@ import * as Util from './util'
  */
 export const TrackPlayBack = L.Class.extend({
 
-  includes: L.Mixin.Events,
+  includes: L.Evented.prototype || L.Mixin.Events,
 
   initialize: function (data, map, options = {}) {
     let drawOptions = {
