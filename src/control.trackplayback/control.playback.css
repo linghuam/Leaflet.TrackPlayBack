@@ -11,22 +11,22 @@
     text-decoration: none;
 }
 .leaflet-control-playback .buttonContainer .btn-stop {
-    background: url(./images/icon-play.png) no-repeat center;
+    background: url(./images/Koloria-Icon-Set/Button_Play_Pause.png) no-repeat center;
 }
 .leaflet-control-playback .buttonContainer .btn-start {
-    background: url(./images/icon-stop.png) no-repeat center;
+    background: url(./images/Koloria-Icon-Set/Button_Stop.png) no-repeat center;
 }
 .leaflet-control-playback .buttonContainer .btn-restart {
-    background: url(./images/icon-restart.png) no-repeat center;
+    background: url(./images/Koloria-Icon-Set/Button_First.png) no-repeat center;
 }
 .leaflet-control-playback .buttonContainer .btn-slow {
-    background: url(./images/icon-slow.png) no-repeat center;
+    background: url(./images/Koloria-Icon-Set/Button_Rewind.png) no-repeat center;
 }
 .leaflet-control-playback .buttonContainer .btn-quick {
-    background:  url(./images/icon-quick.png) no-repeat center;
+    background:  url(./images/Koloria-Icon-Set/Button_FastForward.png) no-repeat center;
 }
 .leaflet-control-playback .buttonContainer .btn-close {
-    background: url(./images/icon-close.png)   no-repeat center;
+    background: url(./imagesKoloria-Icon-Set/Error_Symbol.png)   no-repeat center;
 }
 .leaflet-control-playback .infoContainer {}
 .leaflet-control-playback .sliderContainer {}
